@@ -1,7 +1,7 @@
 {
   "data_job_id": 97338,
   "smoke_job_id": 97491,
-  "train_job_id": 97390,
+  "train_job_id": 98232,
   "retries": 0,
   "cancelled_setup_jobs": [
     97382,
@@ -10,5 +10,9 @@
   "previous_smoke_jobs": [
     97387,
     97401
-  ]
+  ],
+  "previous_train_jobs": [
+    97390
+  ],
+  "pipeline_note": "Running only JiT-B/16 then JiT-L/16, 200 epochs each."
 }

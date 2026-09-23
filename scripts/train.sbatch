@@ -25,13 +25,9 @@ test -f reports/smoke.json
 configs=(
   configs/b16_200ep.json
   configs/l16_200ep.json
-  configs/b32_200ep.json
-  configs/l32_200ep.json
-  configs/h16_200ep.json
-  configs/h32_200ep.json
 )
 for config in "${configs[@]}"; do
   echo "Starting official JiT 200-epoch configuration: ${config}"
   torchrun --standalone --nproc_per_node=8 scripts/run.py --mode train --config "${config}"
 done
-echo 'All six 200-epoch configurations and fixed-CFG FID-50K evaluations completed.'
+echo 'JiT-B/16 and JiT-L/16 200-epoch configurations and fixed-CFG FID-50K evaluations completed.'
