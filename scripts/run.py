@@ -280,6 +280,8 @@ def main():
                 'dataset_images': len(dataset), 'images_per_epoch': len(loader)*args.batch_size*world,
                 'gpu': torch.cuda.get_device_name(), 'torch': torch.__version__,
                 'upstream_commit': subprocess.check_output(['git','-C',str(ROOT/'vendor/JiT'),'rev-parse','HEAD'],text=True).strip(),
+                'runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                'config_sha256': hashlib.sha256(Path(cli.config).read_bytes()).hexdigest(),
                 'dataset_md5': manifest['md5'], 'slurm_job_id': os.environ.get('SLURM_JOB_ID')})
         writer = SummaryWriter(str(output / 'tensorboard')) if rank == 0 else None
         for epoch in range(start_epoch, args.epochs):

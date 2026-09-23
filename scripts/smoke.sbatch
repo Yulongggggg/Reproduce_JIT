@@ -23,9 +23,19 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 torchrun --standalone --nproc_per_node=2 scripts/run.py --mode smoke
 # Confirm that the pinned FID implementation loads its Inception model and reference statistics.
 python - <<'PY'
+import json
+from pathlib import Path
 import numpy as np
+import torch
 from torch_fidelity.feature_extractor_inceptionv3 import FeatureExtractorInceptionV3
 extractor = FeatureExtractorInceptionV3('inception-v3-compat', ['2048', 'logits_unbiased']).cuda()
 stats = np.load('vendor/JiT/fid_stats/jit_in256_stats.npz')
 print('FID extractor ready; reference keys:', stats.files)
+with torch.no_grad():
+    features = extractor(torch.zeros(2,3,256,256,dtype=torch.uint8,device='cuda'))
+assert all(torch.isfinite(x).all() for x in features)
+path = Path('reports/smoke.json')
+result = json.loads(path.read_text())
+result['fid_extractor'] = 'loaded and finite forward pass; reference mu/sigma available'
+path.write_text(json.dumps(result,indent=2)+'\n')
 PY

@@ -2,6 +2,7 @@
 import csv
 import datetime
 import json
+import math
 from pathlib import Path
 import shutil
 import subprocess
@@ -88,6 +89,16 @@ def main():
             fid = r['frechet_inception_distance']
             text.append(f'| {r["ema"]} | {r["cfg"]} | {r["num_images"]} | {fid:.4f} | {r["inception_score_mean"]:.4f} | {fid-4.37:+.4f} |')
         shutil.copy2(RUN/'summary.json', REPORTS/'results.json')
+        selected = f'final-ep200-ema{best["ema"]}-cfg{best["cfg"]:.1f}-n50000'
+        samples = sorted((RUN/'samples'/selected).glob('*.png'))[:64]
+        if samples:
+            from PIL import Image
+            canvas = Image.new('RGB', (8*128, math.ceil(len(samples)/8)*128))
+            for i, path in enumerate(samples):
+                with Image.open(path) as picture:
+                    canvas.paste(picture.resize((128,128), Image.Resampling.LANCZOS), ((i%8)*128,(i//8)*128))
+            canvas.save(REPORTS/'samples.png')
+            text.append('固定类别间隔抽取的生成样本（未按观感筛选；缩小显示）：\n\n![生成样本](samples.png)')
     else:
         text.append('**尚无完成 200 epochs 的 FID/IS 结果；不宣称复现成功。** 数据下载、GPU smoke、排队和训练开始均不代表训练完成。')
     evaluations = [read(p) for p in sorted((RUN/'evaluations').glob('*.json'))]
