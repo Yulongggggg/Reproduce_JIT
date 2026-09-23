@@ -1,6 +1,6 @@
 # JiT-B/16 ImageNet-256 复现报告
 
-更新时间：2026-09-23T15:48:45.530950+00:00
+更新时间：2026-09-23T15:49:31.768020+00:00
 
 
 ## 实际状态
@@ -19,12 +19,12 @@ GPU 冒烟测试：passed。
 ```
 
 
-下载进度快照：已完成 246/551 个分块；完整 MD5 校验和解压尚未完成。
+下载进度快照：已完成 255/551 个分块；完整 MD5 校验和解压尚未完成。
 
 ```text
-97338|jit_data|RUNNING|0:0|00:15:09|alphagpu04
+97338|jit_data|RUNNING|0:0|00:15:55|alphagpu04
 97390|jit_b16_200ep|PENDING|0:0|00:00:00|None assigned
-97401|jit_smoke|RUNNING|0:0|00:00:03|alphagpu01
+97401|jit_smoke|RUNNING|0:0|00:00:49|alphagpu01
 ```
 
 
