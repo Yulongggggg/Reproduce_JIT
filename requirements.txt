@@ -1,0 +1,10 @@
+numpy==1.22.4
+scipy==1.9.1
+timm==0.9.12
+tensorboard==2.10.0
+protobuf==3.19.6
+opencv-python==4.11.0.86
+einops==0.8.1
+gdown==5.2.0
+Pillow==11.3.0
+matplotlib==3.7.5

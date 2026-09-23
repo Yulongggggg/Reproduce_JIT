@@ -1,0 +1,6 @@
+[submodule "vendor/JiT"]
+	path = vendor/JiT
+	url = https://github.com/LTH14/JiT.git
+[submodule "vendor/torch-fidelity"]
+	path = vendor/torch-fidelity
+	url = https://github.com/LTH14/torch-fidelity.git
