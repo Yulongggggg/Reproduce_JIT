@@ -1,11 +1,11 @@
 {
-  "updated_utc": "2026-09-23T15:45:20.904224+00:00",
+  "updated_utc": "2026-09-23T15:46:25.519048+00:00",
   "checkpoint_progress": {
     "completed_epochs": 0,
     "status": "not_started"
   },
   "data_ready": false,
-  "smoke": false,
+  "smoke": true,
   "complete": false,
   "jobs": {
     "data_job_id": 97338,
