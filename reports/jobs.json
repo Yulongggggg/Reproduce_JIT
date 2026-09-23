@@ -1,10 +1,13 @@
 {
   "data_job_id": 97338,
-  "smoke_job_id": 97387,
+  "smoke_job_id": 97401,
   "train_job_id": 97390,
   "retries": 0,
   "cancelled_setup_jobs": [
     97382,
     97385
+  ],
+  "previous_smoke_jobs": [
+    97387
   ]
 }

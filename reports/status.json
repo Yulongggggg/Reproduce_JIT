@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-23T15:46:25.519048+00:00",
+  "updated_utc": "2026-09-23T15:48:28.856553+00:00",
   "checkpoint_progress": {
     "completed_epochs": 0,
     "status": "not_started"
@@ -9,12 +9,15 @@
   "complete": false,
   "jobs": {
     "data_job_id": 97338,
-    "smoke_job_id": 97387,
+    "smoke_job_id": 97401,
     "train_job_id": 97390,
     "retries": 0,
     "cancelled_setup_jobs": [
       97382,
       97385
+    ],
+    "previous_smoke_jobs": [
+      97387
     ]
   }
 }
