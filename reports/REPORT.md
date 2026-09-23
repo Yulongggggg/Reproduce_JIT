@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-23T17:16:26.089966+00:00
+更新时间：2026-09-23T17:17:16.930603+00:00
 
 ## 当前进度
 
@@ -25,8 +25,8 @@ ImageNet 准备中：下载分块 551/551；完整校验和解压尚未完成。
 
 Slurm 队列：
 ```text
-97491 jit_smoke PENDING (Priority)
 97390 jit_b16_200ep PENDING (Dependency)
+97491 jit_smoke RUNNING alphagpu12
 97338 jit_data RUNNING alphagpu04
 ```
 
