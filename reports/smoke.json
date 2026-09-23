@@ -6,21 +6,22 @@
   "world_size": 2,
   "batch_per_gpu": 128,
   "step_seconds": [
-    80.56425848696381,
-    0.17143223714083433,
-    0.120232492685318,
-    0.11904631089419127,
-    0.11927657667547464
+    23.5067455843091,
+    0.14535831566900015,
+    0.11679746396839619,
+    0.11771301459521055,
+    0.11938982922583818
   ],
   "losses": [
     0.9699006080627441,
     0.9296330809593201,
-    1.0824579000473022,
-    0.9195891618728638,
+    1.0824580192565918,
+    0.9195892214775085,
     0.9756079316139221
   ],
-  "max_memory_gib": 25.953200817108154,
+  "max_memory_gib": 25.966193675994873,
   "parameters": 131320320,
   "sampling": "50-step Heun, finite outputs",
-  "checkpoint": "round-trip passed"
+  "checkpoint": "round-trip passed",
+  "fid_extractor": "loaded and finite forward pass; reference mu/sigma available"
 }
