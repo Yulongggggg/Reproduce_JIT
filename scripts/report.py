@@ -33,6 +33,11 @@ def main():
             f'数据：{"完整训练集已校验并解压" if data else "尚未就绪；下载/解压中，详见本地 logs/data-*.log"}。',
             f'GPU 冒烟测试：{smoke["status"] if smoke else "尚未完成"}。',
             f'\n```text\n{queue or "作业已离开队列；终态见下方调度器记录"}\n```\n']
+    if not data:
+        parts = list((ROOT/'data/imagenet/.download_parts').glob('[0-9]*'))
+        text.append(f'下载进度快照：已完成 {len(parts)}/551 个分块；完整 MD5 校验和解压尚未完成。')
+    if jobs.get('pipeline_note'):
+        text.append('流水线记录：' + jobs['pipeline_note'])
     try:
         if ids:
             accounting = subprocess.check_output(['sacct','-X','-j',ids,'--noheader',

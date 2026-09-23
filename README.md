@@ -2,7 +2,7 @@
 
 JiT-B/16 / ImageNet 256×256 / 200 epochs 从头复现。目标参考 FID-50K **4.37**；尚未跑完时不宣称复现成功。
 
-- [实时状态及结果报告](reports/REPORT.md)
+- [进度及结果报告](reports/REPORT.md)
 - [复现前 issue 调查和配置差异](reports/issue_review.md)
 - [锁定训练配置](configs/b16_200ep.json)
 

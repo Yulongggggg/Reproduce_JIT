@@ -42,6 +42,18 @@ def append_json(path, value):
         f.write(json.dumps(value) + '\n')
 
 
+def init_distributed(args):
+    args.rank = int(os.environ['RANK'])
+    args.world_size = int(os.environ['WORLD_SIZE'])
+    args.gpu = int(os.environ['LOCAL_RANK'])
+    torch.cuda.set_device(args.gpu)
+    # Rank zero computes FID while other ranks wait; allow slow shared-storage evaluation.
+    dist.init_process_group('nccl', init_method='env://', rank=args.rank,
+                            world_size=args.world_size, timeout=datetime.timedelta(hours=1))
+    dist.barrier(device_ids=[args.gpu])
+    misc.setup_for_distributed(args.rank == 0)
+
+
 def rng_state():
     return {'torch': torch.get_rng_state(), 'cuda': torch.cuda.get_rng_state(),
             'numpy': np.random.get_state(), 'python': random.getstate()}
@@ -167,7 +179,7 @@ def main():
     args = argparse.Namespace(**cfg, dist_on_itp=False, dist_url='env://', distributed=True)
     args.data_path = str(ROOT / args.data_path)
     args.output_dir = str(ROOT / args.output_dir)
-    misc.init_distributed_mode(args)
+    init_distributed(args)
     rank, world = misc.get_rank(), misc.get_world_size()
     if cli.mode != 'smoke':
         assert world == 8 and args.batch_size * world == 1024
