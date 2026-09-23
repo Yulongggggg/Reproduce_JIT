@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-23T17:23:22.309719+00:00",
+  "updated_utc": "2026-09-23T18:35:55.684064+00:00",
   "model_progress": {
     "b16": {
       "completed_epochs": 0,
@@ -27,7 +27,7 @@
     }
   },
   "completed_models": [],
-  "data_ready": false,
+  "data_ready": true,
   "smoke": true,
   "complete": false,
   "jobs": {

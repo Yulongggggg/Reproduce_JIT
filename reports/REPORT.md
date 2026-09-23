@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-23T17:23:22.309719+00:00
+更新时间：2026-09-23T18:35:55.684064+00:00
 
 ## 当前进度
 
@@ -20,13 +20,12 @@
 
 GPU smoke：passed，NVIDIA H100 80GB HBM3。
 
-ImageNet 准备中：下载分块 551/551；完整校验和解压尚未完成。
+ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 
 Slurm 队列：
 ```text
-97390 jit_b16_200ep PENDING (Dependency)
-97338 jit_data RUNNING alphagpu04
+97390 jit_b16_200ep PENDING (Priority)
 ```
 
 ## 预注册设置
