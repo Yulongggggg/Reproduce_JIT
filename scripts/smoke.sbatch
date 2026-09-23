@@ -20,10 +20,12 @@ export TORCHINDUCTOR_CACHE_DIR="$PWD/.cache/inductor"
 export TRITON_CACHE_DIR="$PWD/.cache/triton"
 export PATH="$PWD/.env/bin:$PATH"
 nvidia-smi --query-gpu=name,memory.total --format=csv
-torchrun --standalone --nproc_per_node=2 scripts/run.py --mode smoke
+export JIT_SMOKE_CONFIG="${JIT_SMOKE_CONFIG:-configs/b16_200ep.json}"
+torchrun --standalone --nproc_per_node=2 scripts/run.py --mode smoke --config "$JIT_SMOKE_CONFIG"
 # Confirm that the pinned FID implementation loads its Inception model and reference statistics.
 python - <<'PY'
 import json
+import re
 from pathlib import Path
 import numpy as np
 import torch
@@ -34,7 +36,9 @@ print('FID extractor ready; reference keys:', stats.files)
 with torch.no_grad():
     features = extractor(torch.zeros(2,3,256,256,dtype=torch.uint8,device='cuda'))
 assert all(torch.isfinite(x).all() for x in features)
-path = Path('reports/smoke.json')
+config = json.loads(Path(__import__('os').environ['JIT_SMOKE_CONFIG']).read_text())
+name = config['model'].replace('/', '-').replace('JiT-', '').lower()
+path = Path(f'reports/smoke_{name}.json')
 result = json.loads(path.read_text())
 result['fid_extractor'] = 'loaded and finite forward pass; reference mu/sigma available'
 path.write_text(json.dumps(result,indent=2)+'\n')

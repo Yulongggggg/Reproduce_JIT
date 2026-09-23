@@ -52,10 +52,12 @@ def main():
                 jobs['pipeline_note'] = f'Resuming from saved checkpoint after {train_state}.'
                 write_jobs(jobs)
                 train_state = 'PENDING'
-            completed = (ROOT/'runs/b16_200ep/summary.json').exists()
+            models = ('b16','l16','b32','l32','h16','h32')
+            complete_models = [m for m in models if (ROOT/f'runs/{m}_200ep/summary.json').exists()]
+            completed = len(complete_models) == len(models)
             done = completed or dependencies_failed or train_state in terminal
             if train_state == 'COMPLETED' and not completed:
-                jobs['pipeline_note'] = 'Slurm completed but final summary missing; NOT a completed reproduction.'
+                jobs['pipeline_note'] = f'Slurm completed after {complete_models}; remaining models did not finish.'
                 write_jobs(jobs)
             if states != previous or time.time() - last_publish >= 21600 or done:
                 published = subprocess.run(['bash','scripts/publish.sh']).returncode == 0

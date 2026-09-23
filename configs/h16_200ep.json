@@ -1,0 +1,14 @@
+{
+  "model": "JiT-H/16", "img_size": 256, "class_num": 1000,
+  "epochs": 200, "warmup_epochs": 5,
+  "batch_size": 32, "grad_accumulation": 4,
+  "blr": 0.00005, "lr": 0.0002, "lr_schedule": "constant", "min_lr": 0.0,
+  "weight_decay": 0.0, "attn_dropout": 0.0, "proj_dropout": 0.2,
+  "P_mean": -0.8, "P_std": 0.8, "noise_scale": 1.0, "t_eps": 0.05,
+  "label_drop_prob": 0.1, "ema_decay1": 0.9999, "ema_decay2": 0.9996,
+  "ema_decays": [0.9999, 0.9996, 0.9998],
+  "sampling_method": "heun", "num_sampling_steps": 50,
+  "cfg": 2.2, "interval_min": 0.1, "interval_max": 1.0,
+  "gen_bsz": 64, "num_workers": 8, "seed": 0, "save_every": 5,
+  "data_path": "data/imagenet", "output_dir": "runs/h16_200ep"
+}

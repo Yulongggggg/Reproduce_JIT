@@ -5,6 +5,7 @@
   "epochs": 200,
   "warmup_epochs": 5,
   "batch_size": 128,
+  "grad_accumulation": 1,
   "blr": 0.00005,
   "lr": 0.0002,
   "lr_schedule": "constant",
@@ -22,7 +23,7 @@
   "ema_decays": [0.9999, 0.9996, 0.9998],
   "sampling_method": "heun",
   "num_sampling_steps": 50,
-  "cfg": 3.6,
+  "cfg": 2.9,
   "interval_min": 0.1,
   "interval_max": 1.0,
   "gen_bsz": 128,
@@ -30,5 +31,6 @@
   "seed": 0,
   "save_every": 5,
   "data_path": "data/imagenet",
-  "output_dir": "runs/b16_200ep"
+  "output_dir": "runs/b16_200ep",
+  "issue56_cfg": 3.6
 }

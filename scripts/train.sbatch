@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=jit_b16_200ep
+#SBATCH --job-name=jit_matrix_200ep
 #SBATCH --partition=alpha
 #SBATCH --account=co_carson_aiaided
 #SBATCH --qos=long
@@ -22,4 +22,16 @@ export PATH="$PWD/.env/bin:$PATH"
 nvidia-smi --query-gpu=name,uuid,memory.total --format=csv
 test -f data/imagenet/manifest.json
 test -f reports/smoke.json
-exec torchrun --standalone --nproc_per_node=8 scripts/run.py --mode train
+configs=(
+  configs/b16_200ep.json
+  configs/l16_200ep.json
+  configs/b32_200ep.json
+  configs/l32_200ep.json
+  configs/h16_200ep.json
+  configs/h32_200ep.json
+)
+for config in "${configs[@]}"; do
+  echo "Starting official JiT 200-epoch configuration: ${config}"
+  torchrun --standalone --nproc_per_node=8 scripts/run.py --mode train --config "${config}"
+done
+echo 'All six 200-epoch configurations and fixed-CFG FID-50K evaluations completed.'

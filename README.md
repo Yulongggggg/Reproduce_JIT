@@ -1,14 +1,27 @@
 # Reproduce JiT
 
-JiT-B/16 / ImageNet 256×256 / 200 epochs 从头复现。目标参考 FID-50K **4.37**；尚未跑完时不宣称复现成功。
+ImageNet-1K 上按优先级训练六个官方 JiT 模型 200 epochs：B/16、L/16、B/32、L/32、H/16、H/32。每个模型固定使用作者按模型和分辨率提供的 CFG，并以该 CFG 单独评估；B/16 同时增加 issue #56 的 CFG=3.6/EMA=0.9996 对照。
 
-- [进度及结果报告](reports/REPORT.md)
-- [复现前 issue 调查和配置差异](reports/issue_review.md)
-- [锁定训练配置](configs/b16_200ep.json)
+- [实时状态及六模型结果](reports/REPORT.md)
+- [复现前 issue 调查](reports/issue_review.md)
+- [逐模型参数配置](configs/)
 
-本地工作目录：`/mnt/home/yliu5/Reproduce_JIT`。
+当前工作目录：`/mnt/home/yliu5/Reproduce_JIT`。
 
-## 运行
+## 训练顺序
+
+```text
+B/16, 256², CFG 2.9     issue #56 comparison: CFG 3.6
+L/16, 256², CFG 2.4
+B/32, 512², CFG 2.9
+L/32, 512², CFG 2.5
+H/16, 256², CFG 2.2
+H/32, 512², CFG 2.3
+```
+
+模型队列使用一个 8-GPU H100/H200 Slurm allocation，以上述顺序执行。各配置的像素分辨率、noise scale、H-model dropout、batch 和梯度累积均在 `configs/` 记录；有效 global batch 为 1024。每个最终 FID 在**该模型固定 CFG** 下用 8K 样本选 EMA，再用 50K 样本复核。B/16 的官方 CFG=2.9 是主结果，3.6 对照单独报告。
+
+## 运行与恢复
 
 ```bash
 git clone --recurse-submodules https://github.com/Yulongggggg/Reproduce_JIT.git
@@ -20,24 +33,17 @@ smoke_job=$(sbatch --parsable scripts/smoke.sbatch)
 sbatch --dependency=afterok:${data_job}:${smoke_job} scripts/train.sbatch
 ```
 
-Slurm 模板对应当前集群账号；换集群需修改 account/partition/QOS。训练申请单节点 8×H100/H200、72 CPU、512 GiB RAM，最长 7 天。正式运行前必须完整数据校验和 GPU smoke 成功。训练结束后自动执行论文的 EMA/CFG 搜索、正式 FID-50K 及对照评估。
+Slurm job script 对应当前集群账号。正式训练申请 8 张 H100/H200、单节点、72 CPU、512 GiB RAM，最长 7 天。数据下载需通过完整 MD5 并解压到 1000 个类别、1,281,167 张原始训练图后才开始训练。
+
+超时或节点故障后，从检查点恢复整个有序队列：
 
 ```bash
-# 从最近 checkpoint 继续到总共 200 epochs，再继续未完成评估
 sbatch scripts/train.sbatch
-# 检查作业
 squeue -u "$USER"
-# 更新本地报告，或将报告提交到 GitHub
 .env/bin/python scripts/report.py
 bash scripts/publish.sh
 ```
 
-`scripts/watch.py` 监测本次提交的作业、更新 GitHub 报告；对节点失败、抢占、超时最多续交 3 次，普通代码错误不会自动无限重试。报告同步拒绝 force-push。
+后台 watcher 检查六个模型结果；报告更新推送到 GitHub，不强推覆盖远端提交。报告、训练日志和事件、checkpoint 均在本地保存；大模型文件和 ImageNet 不提交 Git。
 
-数据和 checkpoint 不进 Git：`data/imagenet`、`runs/b16_200ep`、`logs`。每 5 epochs 保存模型、3 组 EMA、优化器、各 rank RNG，另外保留 100/200 epoch checkpoint。TensorBoard 在 `runs/b16_200ep/tensorboard`。
-
-## 上游
-
-[论文](https://arxiv.org/abs/2511.13720) · [官方 JiT](https://github.com/LTH14/JiT) · [定制 torch-fidelity](https://github.com/LTH14/torch-fidelity)
-
-保留上游代码在各自 submodule 中，许可见对应目录的 LICENSE。复现管理脚本见本仓库 LICENSE。
+上游 PyTorch 实现固定在 `vendor/JiT`；论文 [Back to Basics](https://arxiv.org/abs/2511.13720)。

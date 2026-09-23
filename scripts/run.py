@@ -1,7 +1,7 @@
 """Original JiT model/loss/attention; explicit EMA selection and auditable runs."""
 import argparse
 import copy
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import datetime
 import hashlib
 import json
@@ -146,7 +146,7 @@ def evaluate(model, args, decay, cfg, count, phase, epoch):
             assert actual == count, (actual, count)
             metrics = torch_fidelity.calculate_metrics(
                 input1=str(folder), input2=None,
-                fid_statistics_file=str(ROOT / 'vendor/JiT/fid_stats/jit_in256_stats.npz'),
+            fid_statistics_file=str(ROOT / 'vendor/JiT/fid_stats' / f'jit_in{args.img_size}_stats.npz'),
                 cuda=True, isc=True, fid=True, kid=False, prc=False, verbose=False)
             result = {'phase': phase, 'completed_epochs': epoch, 'ema': decay, 'cfg': cfg,
                       'num_images': count, 'seed': args.seed, 'world_size': world,
@@ -182,7 +182,7 @@ def main():
     init_distributed(args)
     rank, world = misc.get_rank(), misc.get_world_size()
     if cli.mode != 'smoke':
-        assert world == 8 and args.batch_size * world == 1024
+        assert world == 8 and args.batch_size * world * args.grad_accumulation == 1024
     torch.manual_seed(args.seed + rank)
     np.random.seed(args.seed + rank)
     random.seed(args.seed + rank)
@@ -201,13 +201,16 @@ def main():
         times, losses = [], []
         for step in range(cli.smoke_steps):
             start = time.monotonic()
-            x = torch.rand(args.batch_size, 3, args.img_size, args.img_size, device='cuda') * 2 - 1
-            y = torch.arange(args.batch_size, device='cuda') % args.class_num
-            optimizer.zero_grad()
-            with torch.amp.autocast('cuda', dtype=torch.bfloat16):
-                loss = ddp(x, y)
-            assert torch.isfinite(loss), loss
-            loss.backward()
+            optimizer.zero_grad(set_to_none=True)
+            for microstep in range(args.grad_accumulation):
+                x = torch.rand(args.batch_size, 3, args.img_size, args.img_size, device='cuda') * 2 - 1
+                y = torch.arange(args.batch_size, device='cuda') % args.class_num
+                sync_context = nullcontext() if microstep + 1 == args.grad_accumulation else ddp.no_sync()
+                with sync_context:
+                    with torch.amp.autocast('cuda', dtype=torch.bfloat16):
+                        loss = ddp(x, y)
+                    assert torch.isfinite(loss), loss
+                    (loss / args.grad_accumulation).backward()
             optimizer.step()
             update_emas(model)
             torch.cuda.synchronize()
@@ -221,7 +224,8 @@ def main():
         # Checkpoint round-trip, including optimizer and three EMA buffers.
         generator = torch.Generator().manual_seed(args.seed + rank)
         original_output = args.output_dir
-        args.output_dir = str(ROOT / 'runs/smoke')
+        safe_model = args.model.replace('/', '-').replace('JiT-', '').lower()
+        args.output_dir = str(ROOT / f'runs/smoke_{safe_model}')
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
         save_checkpoint(model, optimizer, args, 0, cli.smoke_steps, generator)
         restored = torch.load(Path(args.output_dir) / 'checkpoint-last.pth', map_location='cpu', weights_only=False)
@@ -237,7 +241,9 @@ def main():
                       'max_memory_gib': torch.cuda.max_memory_allocated() / 1024**3,
                       'parameters': sum(p.numel() for p in model.parameters()),
                       'sampling': '50-step Heun, finite outputs', 'checkpoint': 'round-trip passed'}
-            atomic_json(ROOT / 'reports/smoke.json', result)
+            atomic_json(ROOT / f'reports/smoke_{safe_model}.json', result)
+            if args.model == 'JiT-B/16':
+                atomic_json(ROOT / 'reports/smoke.json', result)
             print(json.dumps(result), flush=True)
         dist.destroy_process_group()
         return
@@ -274,9 +280,12 @@ def main():
         sampler = torch.utils.data.DistributedSampler(dataset, num_replicas=world, rank=rank, shuffle=True)
         loader = torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=args.batch_size,
                     num_workers=args.num_workers, pin_memory=True, drop_last=True, generator=generator)
+        assert len(loader) % args.grad_accumulation == 0
+        steps_per_epoch = len(loader) // args.grad_accumulation
         if rank == 0:
             atomic_json(output / 'run_metadata.json', {
-                'config': vars(args), 'world_size': world, 'steps_per_epoch': len(loader),
+                'config': vars(args), 'world_size': world, 'microsteps_per_epoch': len(loader),
+                'steps_per_epoch': steps_per_epoch, 'grad_accumulation': args.grad_accumulation,
                 'dataset_images': len(dataset), 'images_per_epoch': len(loader)*args.batch_size*world,
                 'gpu': torch.cuda.get_device_name(), 'torch': torch.__version__,
                 'upstream_commit': subprocess.check_output(['git','-C',str(ROOT/'vendor/JiT'),'rev-parse','HEAD'],text=True).strip(),
@@ -289,24 +298,29 @@ def main():
             ddp.train()
             total_loss = torch.zeros((), device='cuda')
             start = time.monotonic()
+            optimizer.zero_grad(set_to_none=True)
             for step, (x, labels) in enumerate(loader):
-                lr_sched.adjust_learning_rate(optimizer, epoch + step / len(loader), args)
+                lr_sched.adjust_learning_rate(optimizer, epoch + (step // args.grad_accumulation) / steps_per_epoch, args)
                 x = x.cuda(non_blocking=True).float().div_(255) * 2 - 1
                 labels = labels.cuda(non_blocking=True)
-                with torch.amp.autocast('cuda', dtype=torch.bfloat16):
-                    loss = ddp(x, labels)
-                finite = torch.isfinite(loss).int()
-                dist.all_reduce(finite, op=dist.ReduceOp.MIN)
-                if not finite.item():
-                    raise RuntimeError(f'Non-finite loss epoch={epoch+1} step={step}')
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                torch.cuda.synchronize()
-                update_emas(model)
-                global_step += 1
+                sync_now = (step + 1) % args.grad_accumulation == 0
+                sync_context = nullcontext() if sync_now else ddp.no_sync()
+                with sync_context:
+                    with torch.amp.autocast('cuda', dtype=torch.bfloat16):
+                        loss = ddp(x, labels)
+                    finite = torch.isfinite(loss).int()
+                    dist.all_reduce(finite, op=dist.ReduceOp.MIN)
+                    if not finite.item():
+                        raise RuntimeError(f'Non-finite loss epoch={epoch+1} microstep={step}')
+                    (loss / args.grad_accumulation).backward()
+                if sync_now:
+                    optimizer.step()
+                    optimizer.zero_grad(set_to_none=True)
+                    torch.cuda.synchronize()
+                    update_emas(model)
+                    global_step += 1
                 total_loss += loss.detach()
-                if step % 100 == 0:
+                if sync_now and global_step % 100 == 1:
                     value = misc.all_reduce_mean(loss.item())
                     if rank == 0:
                         writer.add_scalar('train/loss', value, global_step)
@@ -315,6 +329,7 @@ def main():
             dist.all_reduce(total_loss)
             if rank == 0:
                 row = {'epoch': epoch+1, 'global_step': global_step,
+                       'model': args.model,
                        'loss': total_loss.item()/len(loader)/world,
                        'lr': optimizer.param_groups[0]['lr'], 'seconds': time.monotonic()-start,
                        'peak_memory_gib': torch.cuda.max_memory_allocated()/1024**3}
@@ -324,23 +339,25 @@ def main():
             if (epoch+1) % args.save_every == 0 or epoch+1 == args.epochs:
                 save_checkpoint(model, optimizer, args, epoch, global_step, generator)
             if (epoch+1) % 40 == 0 and epoch+1 < args.epochs:
-                evaluate(model, args, 0.9996, 3.6, 8000, 'monitor', epoch+1)
+                evaluate(model, args, 0.9996, args.cfg, 8000, 'monitor', epoch+1)
         if writer:
             writer.close()
     else:
         assert start_epoch == args.epochs, 'Final evaluation requires the completed 200-epoch checkpoint'
-    # Paper Appendix A: all three EMAs, CFG 1.0..4.0 in 0.1 increments, 8K tuning samples.
-    sweep = []
+    # Hold each model's official CFG fixed; select EMA on 8K then report FID-50K.
+    ema_results = []
     for decay in (0.9996, 0.9998, 0.9999):
-        for value in range(10, 41):
-            sweep.append(evaluate(model, args, decay, value/10, 8000, 'sweep', args.epochs))
-    best = min(sweep, key=lambda r: r['frechet_inception_distance'])
-    # Full 50K primary setting and README-default baseline distinguish the issue #56 effect.
-    settings = {(best['ema'], best['cfg']), (0.9996, 3.6), (0.9999, 2.9)}
-    finals = [evaluate(model, args, d, c, 50000, 'final', args.epochs) for d, c in sorted(settings)]
+        ema_results.append(evaluate(model, args, decay, args.cfg, 8000, 'ema-select', args.epochs))
+    best = min(ema_results, key=lambda r: r['frechet_inception_distance'])
+    finals = [evaluate(model, args, best['ema'], args.cfg, 50000, 'final', args.epochs)]
+    issue56 = None
+    if args.model == 'JiT-B/16':
+        issue56 = evaluate(model, args, 0.9996, args.issue56_cfg, 50000, 'issue56', args.epochs)
     if rank == 0:
         atomic_json(output / 'summary.json', {'status': 'complete', 'completed_epochs': args.epochs,
-                    'selected_on_8k': best, 'final_50k': finals, 'paper_fid_200ep': 4.37})
+                    'model': args.model, 'resolution': args.img_size, 'official_cfg': args.cfg,
+                    'ema_selection_on_8k_at_fixed_official_cfg': best,
+                    'final_50k_official_cfg': finals, 'issue56_diagnostic_50k': issue56})
     dist.destroy_process_group()
 
 
