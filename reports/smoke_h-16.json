@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "purpose": "synthetic GPU pipeline smoke test; NOT training or FID",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "torch": "2.5.1+cu124",
+  "world_size": 2,
+  "batch_per_gpu": 32,
+  "step_seconds": [
+    114.47525605373085,
+    0.8574842838570476,
+    0.8013027878478169,
+    0.794590849429369,
+    0.8003011140972376
+  ],
+  "losses": [
+    0.7963873147964478,
+    0.9774880409240723,
+    0.8422825336456299,
+    0.7302768230438232,
+    1.1097465753555298
+  ],
+  "max_memory_gib": 53.3088960647583,
+  "parameters": 952842048,
+  "sampling": "50-step Heun, finite outputs",
+  "checkpoint": "round-trip passed",
+  "fid_extractor": "loaded and finite forward pass; reference mu/sigma available"
+}
