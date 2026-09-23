@@ -1,15 +1,38 @@
 {
-  "updated_utc": "2026-09-23T15:50:38.330784+00:00",
-  "checkpoint_progress": {
-    "completed_epochs": 0,
-    "status": "not_started"
+  "updated_utc": "2026-09-23T17:16:14.067940+00:00",
+  "model_progress": {
+    "b16": {
+      "completed_epochs": 0,
+      "status": "not_started"
+    },
+    "l16": {
+      "completed_epochs": 0,
+      "status": "not_started"
+    },
+    "b32": {
+      "completed_epochs": 0,
+      "status": "not_started"
+    },
+    "l32": {
+      "completed_epochs": 0,
+      "status": "not_started"
+    },
+    "h16": {
+      "completed_epochs": 0,
+      "status": "not_started"
+    },
+    "h32": {
+      "completed_epochs": 0,
+      "status": "not_started"
+    }
   },
+  "completed_models": [],
   "data_ready": false,
   "smoke": true,
   "complete": false,
   "jobs": {
     "data_job_id": 97338,
-    "smoke_job_id": 97401,
+    "smoke_job_id": 97491,
     "train_job_id": 97390,
     "retries": 0,
     "cancelled_setup_jobs": [
@@ -17,7 +40,8 @@
       97385
     ],
     "previous_smoke_jobs": [
-      97387
+      97387,
+      97401
     ]
   }
 }

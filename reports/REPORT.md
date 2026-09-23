@@ -1,67 +1,72 @@
-# JiT-B/16 ImageNet-256 复现报告
+# JiT 官方配置复现实验报告
 
-更新时间：2026-09-23T15:50:38.330784+00:00
+更新时间：2026-09-23T17:16:14.067940+00:00
+
+## 当前进度
+
+**已完成 200 epochs：0/6。** 当前训练进度：
+
+- JiT-B/16：0/200 epochs
+
+- JiT-L/16：0/200 epochs
+
+- JiT-B/32：0/200 epochs
+
+- JiT-L/32：0/200 epochs
+
+- JiT-H/16：0/200 epochs
+
+- JiT-H/32：0/200 epochs
+
+GPU smoke：passed，NVIDIA H100 80GB HBM3。
+
+ImageNet 准备中：下载分块 551/551；完整校验和解压尚未完成。
 
 
-## 实际状态
-
-已保存训练进度：**0/200 epochs**。
-
-数据：尚未就绪；下载/解压中，详见本地 logs/data-*.log。
-
-GPU 冒烟测试：passed。
-
-
+Slurm 队列：
 ```text
+97491 jit_smoke PENDING (Priority)
 97390 jit_b16_200ep PENDING (Dependency)
 97338 jit_data RUNNING alphagpu04
 ```
 
+## 预注册设置
 
-下载进度快照：已完成 267/551 个分块；完整 MD5 校验和解压尚未完成。
+依次训练 JiT-B/16、JiT-L/16、B/32、L/32、H/16、H/32；每个模型从头训练 200 epochs，AdamW、实际 LR=2e-4、全局有效 batch=1024、5 epoch warmup、constant LR。
 
-```text
-97338|jit_data|RUNNING|0:0|00:17:02|alphagpu04
-97390|jit_b16_200ep|PENDING|0:0|00:00:00|None assigned
-97401|jit_smoke|COMPLETED|0:0|00:01:23|alphagpu01
-```
+固定 CFG 和分辨率：B/16 256² CFG 2.9（官方；另测 issue #56 的 CFG 3.6、EMA 0.9996）；L/16 256² CFG 2.4；B/32 512² CFG 2.9；L/32 512² CFG 2.5；H/16 256² CFG 2.2；H/32 512² CFG 2.3。CFG interval 均为 [0.1,1.0]，ODE solver 为 50-step Heun。
 
+CFG 取自作者 README 按模型和分辨率给出的训练／评估示例。每个 CFG 固定，不跨值搜索；每个模型只在该 CFG 下用 8K 选择 EMA，再以相同 CFG 和 EMA 计算 FID-50K。
 
-## 目标和设置
+训练超参、批量和累积步数见 [`configs/`](../configs/)。梯度累积保持全局有效 batch=1024。H 型官方 proj dropout=0.2，其余为 0。P_mean=-0.8、P_std=0.8、t_eps=0.05、label drop=0.1、noise scale=res/256。
 
 
-目标是从头训练 JiT-B/16 至 200 epochs，比较论文的 FID-50K **4.37**。
+## FID-50K 对照
 
-论文原始实现为 JAX/TPU；本工程使用作者公开的 PyTorch/GPU 实现。
+| 模型 | 分辨率 | 固定 CFG | 200-epoch 论文 FID | 本次 EMA | 本次 FID-50K | 差值 |
 
-完整参数见 [配置](../configs/b16_200ep.json)，来源、成功复现反馈和差异见 [调查报告](issue_review.md)。
+|---|---:|---:|---:|---:|---:|---:|
 
-8 张 H100/H200，单卡 batch 128，全局 batch 1024；AdamW β=(0.9,0.95)，weight decay=0，实际 LR=2e-4，5 epoch warmup 后恒定。
+| JiT-B/16 | 256² | 2.9 | 4.37 | — | — | — |
 
-模型直接预测 x，以 v 空间 MSE 训练；bf16 autocast；保留上游 FP32 attention score、torch.compile 和 t_eps=0.05。
+| JiT-L/16 | 256² | 2.4 | 2.79 | — | — | — |
 
-EMA 同时跟踪 0.9996/0.9998/0.9999；CFG 1.0–4.0，步长 0.1，在 8K 样本上搜索；选择后用均衡覆盖 1000 类的 50K 样本确认。
+| JiT-B/32 | 512² | 2.9 | 4.64 | — | — | — |
 
-另评估 issue #56 的 EMA=0.9996/CFG=3.6 和 README 默认 EMA=0.9999/CFG=2.9，均用 50K 样本。
+| JiT-L/32 | 512² | 2.5 | 3.06 | — | — | — |
 
-预注册随机种子 0；50 步 Heun（末步 Euler），CFG interval [0.1,1.0]；作者定制 torch-fidelity 和 jit_in256_stats.npz。
+| JiT-H/16 | 256² | 2.2 | 2.29 | — | — | — |
 
-
-## 测量结果
-
-
-**尚无完成 200 epochs 的 FID/IS 结果；不宣称复现成功。** 数据下载、GPU smoke、排队和训练开始均不代表训练完成。
+| JiT-H/32 | 512² | 2.3 | 2.51 | — | — | — |
 
 
-## 证据与限制
+**训练尚未开始；目前没有本次实验的 FID。**
 
 
-数据、checkpoint、TensorBoard 原始事件及完整日志保留在本地，不提交大文件到 GitHub。
+## 复现证据与边界
 
-checkpoint 使用临时文件原子替换，并保留 100/200 epoch 快照、优化器和各 rank RNG；每 5 epochs 保存一次，中断可能重做至多 5 epochs。
+上游 JiT 与定制 torch-fidelity 使用锁定 submodule；原模型、denoiser、loss 和 attention 保持上游实现。环境锁、GPU smoke 和数据验证记录见本目录。
 
-训练采样器与官方一致：DistributedSampler + drop_last，每个 epoch 1251 个 optimizer steps，200 epochs 共 250200 steps。
+训练保存 checkpoint、三组 EMA、优化器和各 rank RNG，每 5 epochs 保存一次；执行顺序为 B/16、L/16 优先，随后其余四种。
 
-数据顺序、额外 EMA、独立 DataLoader RNG、监测评估恢复 RNG、软件次版本及硬件差异都可能影响精确数值，因此以真实 FID 和设置差异报告，不保证等于 4.37。
-
-仅单一训练 seed；生成的主评估选参依照论文 8K 搜索规则，不能用多个 50K 结果反向选择最小值作为主结果。
+200 epoch 是目标训练预算；FID 使用 1000 类均衡的 50K 样本。8K 只用于选 EMA，不代替正式结果。
