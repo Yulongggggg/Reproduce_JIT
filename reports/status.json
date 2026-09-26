@@ -1,17 +1,22 @@
 {
-  "updated_utc": "2026-09-26T17:44:56.833018+00:00",
+  "updated_utc": "2026-09-26T18:15:47.030795+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
-      "completed_epochs": 40,
+      "completed_epochs": 42,
       "target_epochs": 200,
-      "global_step": 50040,
+      "global_step": 52542,
       "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/b16_4gpu_200ep/checkpoint-last.pth",
-      "updated_utc": "2026-09-26T14:51:25.726965+00:00"
+      "checkpoint_completed_epochs": 40,
+      "checkpoint_global_step": 50040,
+      "checkpoint_updated_utc": "2026-09-26T14:51:25.726965+00:00"
     },
     "l16": {
       "completed_epochs": 0,
-      "status": "not_started"
+      "status": "not_started",
+      "checkpoint_completed_epochs": 0,
+      "checkpoint_global_step": 0,
+      "checkpoint_updated_utc": null
     }
   },
   "gpu_count": 4,
@@ -49,7 +54,7 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101980,
-    "pipeline_note": "2026-09-26 13:44 EDT\uff1a\u7eed\u8dd1\u4f5c\u4e1a 101980 \u5df2\u5728 alphagpu07 \u7684 4 \u5f20 H100 \u4e0a\u8fd0\u884c\uff0c13:39 \u6210\u529f\u6062\u590d 40-epoch / 50,040-update \u68c0\u67e5\u70b9\u3002\u7b2c 41 epoch \u5df2\u6709 step 321/2502 \u7684\u65b0\u65e5\u5fd7\uff0c\u672a\u89c1\u65b0\u62a5\u9519\uff1b\u957f\u671f\u7a33\u5b9a\u6027\u7ee7\u7eed\u89c2\u5bdf\u3002effective batch=1024\u3001LR=2e-4\u3001B/16 CFG=2.9\u3002L/16 \u5c1a\u672a\u5f00\u59cb\u3002",
+    "pipeline_note": "2026-09-26\uff1a\u4f5c\u4e1a 101980 \u5df2\u5728 alphagpu07 \u7684 4 \u5f20 H100 \u4e0a\u6062\u590d\u8bad\u7ec3\uff0c\u5e76\u5b8c\u6574\u8dd1\u8fc7\u6b64\u524d\u5931\u8d25\u7684\u7b2c 41 \u8f6e\u4ee5\u53ca\u4e0b\u4e00\u8f6e\u3002\u5b9e\u65f6\u5df2\u5b8c\u6210\u8f6e\u6570\u89c1\u672c\u62a5\u544a\u7684\u8bad\u7ec3\u65e5\u5fd7\u8fdb\u5ea6\uff1b\u6bcf 5 \u8f6e\u4fdd\u5b58\u7684\u68c0\u67e5\u70b9\u5355\u72ec\u5217\u51fa\u3002effective batch=1024\u3001LR=2e-4\u3001B/16 CFG=2.9\u3002L/16 \u5c06\u5728 B/16 \u5b8c\u6210\u540e\u5f00\u59cb\u3002",
     "active_train_job_id": 101980
   }
 }

@@ -38,12 +38,21 @@ def main():
             rows.extend({**json.loads(line), 'model':model} for line in (run/'train.jsonl').read_text().splitlines() if line)
     rows = list({(r['model'],r['epoch']):r for r in rows}.values())
     rows.sort(key=lambda r:(MODELS.index(r['model']),r['epoch']))
+    for model in MODELS:
+        saved = progress[model]
+        saved['checkpoint_completed_epochs'] = saved['completed_epochs']
+        saved['checkpoint_global_step'] = saved.get('global_step', 0)
+        saved['checkpoint_updated_utc'] = saved.pop('updated_utc', None)
+        recorded = [r for r in rows if r['model'] == model]
+        if recorded and recorded[-1]['epoch'] > saved['completed_epochs']:
+            saved['completed_epochs'] = recorded[-1]['epoch']
+            saved['global_step'] = recorded[-1]['global_step']
     if rows:
         with (REPORTS/'training.csv').open('w') as f:
             writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n'); writer.writeheader(); writer.writerows(rows)
     text = [f'# JiT 官方配置复现实验报告\n\n更新时间：{stamp}',
-            f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 当前展示独立的 4 卡实验，训练进度来自已保存的检查点：']
-    text.extend([f'- JiT-{m[0].upper()}/{m[1:]}：{progress[m]["completed_epochs"]}/200 epochs' for m in MODELS])
+            f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；检查点每 5 轮保存，异常退出后从检查点恢复：']
+    text.extend([f'- JiT-{m[0].upper()}/{m[1:]}：训练日志已完成 {progress[m]["completed_epochs"]}/200 epochs；可恢复检查点为第 {progress[m]["checkpoint_completed_epochs"]} 轮。' for m in MODELS])
     for m in MODELS:
         recent = [r for r in rows if r['model'] == m][-5:]
         if recent:
