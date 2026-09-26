@@ -1,0 +1,14 @@
+{
+  "phase": "monitor",
+  "completed_epochs": 40,
+  "ema": 0.9996,
+  "cfg": 2.9,
+  "num_images": 8000,
+  "seed": 0,
+  "world_size": 4,
+  "gen_bsz": 128,
+  "seconds": 292.2008288195357,
+  "inception_score_mean": 65.71511152357893,
+  "inception_score_std": 2.399818468169533,
+  "frechet_inception_distance": 25.113688478275492
+}

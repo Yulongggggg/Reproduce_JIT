@@ -2,6 +2,7 @@
 import argparse
 import copy
 from contextlib import contextmanager, nullcontext
+from functools import partial
 import datetime
 import hashlib
 import json
@@ -20,10 +21,7 @@ import numpy as np
 from PIL import Image
 import torch
 import torch.distributed as dist
-from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets, transforms
-import torch_fidelity
-from denoiser import Denoiser
 from util.crop import center_crop_arr
 import util.lr_sched as lr_sched
 import util.misc as misc
@@ -40,6 +38,20 @@ def atomic_json(path, value):
 def append_json(path, value):
     with Path(path).open('a') as f:
         f.write(json.dumps(value) + '\n')
+
+
+def training_transform(image_size):
+    # A top-level function/partial can be pickled by spawned DataLoader workers.
+    return transforms.Compose([partial(center_crop_arr, image_size=image_size),
+                               transforms.RandomHorizontalFlip(), transforms.PILToTensor()])
+
+
+def training_loader(dataset, sampler, batch_size, num_workers, generator):
+    # Forking after CUDA/Inductor initialization can inherit broken LLVM thread state.
+    # Recreate workers each epoch so their RNG seeds remain checkpoint-resumable.
+    return torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=batch_size,
+        num_workers=num_workers, pin_memory=True, drop_last=True, generator=generator,
+        multiprocessing_context='spawn' if num_workers else None)
 
 
 def init_distributed(args):
@@ -142,6 +154,7 @@ def evaluate(model, args, decay, cfg, count, phase, epoch):
         dist.barrier()
         result = None
         if rank == 0:
+            import torch_fidelity
             actual = len(list(folder.glob('*.png')))
             assert actual == count, (actual, count)
             metrics = torch_fidelity.calculate_metrics(
@@ -170,6 +183,10 @@ def evaluate(model, args, decay, cfg, count, phase, epoch):
 
 
 def main():
+    # Spawned image workers import this module but do not need model/compiler setup.
+    from denoiser import Denoiser
+    from torch.utils.tensorboard import SummaryWriter
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', default=str(ROOT / 'configs/b16_200ep.json'))
     parser.add_argument('--mode', choices=['train', 'evaluate', 'smoke'], default='train')
@@ -272,14 +289,12 @@ def main():
     if cli.mode == 'train':
         manifest = json.loads((Path(args.data_path) / 'manifest.json').read_text())
         assert manifest['status'] == 'ready' and manifest['images'] == 1281167
-        transform = transforms.Compose([transforms.Lambda(lambda img: center_crop_arr(img, args.img_size)),
-                                        transforms.RandomHorizontalFlip(), transforms.PILToTensor()])
+        transform = training_transform(args.img_size)
         dataset = datasets.ImageFolder(Path(args.data_path) / 'train', transform=transform)
         assert len(dataset) == 1281167 and len(dataset.classes) == 1000
         assert dataset.classes == sorted(manifest['classes'])
         sampler = torch.utils.data.DistributedSampler(dataset, num_replicas=world, rank=rank, shuffle=True)
-        loader = torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=args.batch_size,
-                    num_workers=args.num_workers, pin_memory=True, drop_last=True, generator=generator)
+        loader = training_loader(dataset, sampler, args.batch_size, args.num_workers, generator)
         assert len(loader) % args.grad_accumulation == 0
         steps_per_epoch = len(loader) // args.grad_accumulation
         if rank == 0:

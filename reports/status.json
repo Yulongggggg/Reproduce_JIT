@@ -1,51 +1,54 @@
 {
-  "updated_utc": "2026-09-23T22:33:40.512732+00:00",
+  "updated_utc": "2026-09-26T15:43:50.696659+00:00",
   "model_progress": {
     "b16": {
-      "completed_epochs": 0,
-      "status": "not_started"
+      "status": "training",
+      "completed_epochs": 40,
+      "target_epochs": 200,
+      "global_step": 50040,
+      "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/b16_4gpu_200ep/checkpoint-last.pth",
+      "updated_utc": "2026-09-26T14:51:25.726965+00:00"
     },
     "l16": {
       "completed_epochs": 0,
       "status": "not_started"
-    },
-    "b32": {
-      "completed_epochs": 0,
-      "status": "not_started"
-    },
-    "l32": {
-      "completed_epochs": 0,
-      "status": "not_started"
-    },
-    "h16": {
-      "completed_epochs": 0,
-      "status": "not_started"
-    },
-    "h32": {
-      "completed_epochs": 0,
-      "status": "not_started"
     }
   },
+  "gpu_count": 4,
   "completed_models": [],
   "data_ready": true,
   "smoke": true,
   "complete": false,
   "jobs": {
-    "data_job_id": 97338,
-    "smoke_job_id": 97491,
-    "train_job_id": 98232,
-    "retries": 0,
-    "cancelled_setup_jobs": [
-      97382,
-      97385
+    "purpose": "JiT-B/16 then JiT-L/16, 200 epochs each, four GPUs",
+    "global_batch": 1024,
+    "learning_rate": 0.0002,
+    "config_files": [
+      "configs/b16_4gpu_200ep.json",
+      "configs/l16_4gpu_200ep.json"
     ],
-    "previous_smoke_jobs": [
-      97387,
-      97401
+    "script": "scripts/train4.sbatch",
+    "dependency": "afternotok",
+    "job_ids": [
+      101979,
+      101980,
+      101981,
+      101982,
+      101983,
+      101984,
+      101985,
+      101986,
+      101987,
+      101988,
+      101989,
+      101990,
+      101991,
+      101992,
+      101993,
+      101994
     ],
-    "previous_train_jobs": [
-      97390
-    ],
-    "pipeline_note": "Running only JiT-B/16 then JiT-L/16, 200 epochs each."
+    "last_failed_job_id": 101979,
+    "next_train_job_id": 101980,
+    "pipeline_note": "2026-09-26：4 张 H100 的 B/16 已保存 40/200 epoch。首段 101979 在第 41 epoch 因 LLVM pthread_join / DataLoader worker SIGABRT 失败，续跑段 101980 已进入调度队列。已改用 spawn 启动训练 DataLoader；实际 GPU 续跑结果待验证。effective batch 1024、LR 2e-4、B/16 CFG 2.9。 CPU 实图回归验证已通过：预处理与断点恢复随机状态一致，详见 recovery_20260926.md 和 dataloader_spawn_validation.json。"
   }
 }

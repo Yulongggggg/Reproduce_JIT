@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "scope": "CPU regression, real ImageNet images",
+  "torch": "2.5.1+cu124",
+  "workers": 2,
+  "start_method": "spawn",
+  "after_inductor_compile": true,
+  "preprocessing_unchanged": true,
+  "epoch_boundary_rng_restore_equal": true,
+  "gpu_resume_validated": false
+}

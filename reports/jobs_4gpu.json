@@ -25,5 +25,8 @@
     101992,
     101993,
     101994
-  ]
+  ],
+  "last_failed_job_id": 101979,
+  "next_train_job_id": 101980,
+  "pipeline_note": "2026-09-26：4 张 H100 的 B/16 已保存 40/200 epoch。首段 101979 在第 41 epoch 因 LLVM pthread_join / DataLoader worker SIGABRT 失败，续跑段 101980 已进入调度队列。已改用 spawn 启动训练 DataLoader；实际 GPU 续跑结果待验证。effective batch 1024、LR 2e-4、B/16 CFG 2.9。 CPU 实图回归验证已通过：预处理与断点恢复随机状态一致，详见 recovery_20260926.md 和 dataloader_spawn_validation.json。"
 }
