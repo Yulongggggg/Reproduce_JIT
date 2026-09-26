@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-26T15:43:50.696659+00:00
+更新时间：2026-09-26T17:44:56.833018+00:00
 
 ## 当前进度
 
@@ -23,7 +23,6 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-101980 jit_b16_l16_4gpu PENDING (Priority)
 101994 jit_b16_l16_4gpu PENDING (Dependency)
 101993 jit_b16_l16_4gpu PENDING (Dependency)
 101992 jit_b16_l16_4gpu PENDING (Dependency)
@@ -38,9 +37,10 @@ Slurm 队列：
 101983 jit_b16_l16_4gpu PENDING (Dependency)
 101982 jit_b16_l16_4gpu PENDING (Dependency)
 101981 jit_b16_l16_4gpu PENDING (Dependency)
+101980 jit_b16_l16_4gpu RUNNING alphagpu07
 ```
 
-流水线记录：2026-09-26：4 张 H100 的 B/16 已保存 40/200 epoch。首段 101979 在第 41 epoch 因 LLVM pthread_join / DataLoader worker SIGABRT 失败，续跑段 101980 已进入调度队列。已改用 spawn 启动训练 DataLoader；实际 GPU 续跑结果待验证。effective batch 1024、LR 2e-4、B/16 CFG 2.9。 CPU 实图回归验证已通过：预处理与断点恢复随机状态一致，详见 recovery_20260926.md 和 dataloader_spawn_validation.json。
+流水线记录：2026-09-26 13:44 EDT：续跑作业 101980 已在 alphagpu07 的 4 张 H100 上运行，13:39 成功恢复 40-epoch / 50,040-update 检查点。第 41 epoch 已有 step 321/2502 的新日志，未见新报错；长期稳定性继续观察。effective batch=1024、LR=2e-4、B/16 CFG=2.9。L/16 尚未开始。
 
 ## 预注册设置
 

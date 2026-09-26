@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-26T15:43:50.696659+00:00",
+  "updated_utc": "2026-09-26T17:44:56.833018+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -49,6 +49,7 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101980,
-    "pipeline_note": "2026-09-26：4 张 H100 的 B/16 已保存 40/200 epoch。首段 101979 在第 41 epoch 因 LLVM pthread_join / DataLoader worker SIGABRT 失败，续跑段 101980 已进入调度队列。已改用 spawn 启动训练 DataLoader；实际 GPU 续跑结果待验证。effective batch 1024、LR 2e-4、B/16 CFG 2.9。 CPU 实图回归验证已通过：预处理与断点恢复随机状态一致，详见 recovery_20260926.md 和 dataloader_spawn_validation.json。"
+    "pipeline_note": "2026-09-26 13:44 EDT\uff1a\u7eed\u8dd1\u4f5c\u4e1a 101980 \u5df2\u5728 alphagpu07 \u7684 4 \u5f20 H100 \u4e0a\u8fd0\u884c\uff0c13:39 \u6210\u529f\u6062\u590d 40-epoch / 50,040-update \u68c0\u67e5\u70b9\u3002\u7b2c 41 epoch \u5df2\u6709 step 321/2502 \u7684\u65b0\u65e5\u5fd7\uff0c\u672a\u89c1\u65b0\u62a5\u9519\uff1b\u957f\u671f\u7a33\u5b9a\u6027\u7ee7\u7eed\u89c2\u5bdf\u3002effective batch=1024\u3001LR=2e-4\u3001B/16 CFG=2.9\u3002L/16 \u5c1a\u672a\u5f00\u59cb\u3002",
+    "active_train_job_id": 101980
   }
 }
