@@ -182,7 +182,7 @@ def main():
     init_distributed(args)
     rank, world = misc.get_rank(), misc.get_world_size()
     if cli.mode != 'smoke':
-        assert world == 8 and args.batch_size * world * args.grad_accumulation == 1024
+        assert world in (4, 8) and args.batch_size * world * args.grad_accumulation == 1024
     torch.manual_seed(args.seed + rank)
     np.random.seed(args.seed + rank)
     random.seed(args.seed + rank)
