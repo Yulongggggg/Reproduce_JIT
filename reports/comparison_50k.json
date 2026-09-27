@@ -1,0 +1,30 @@
+[
+  {
+    "gpu_count": 4,
+    "run": "b16_4gpu_200ep",
+    "model": "JiT-B/16",
+    "resolution": 256,
+    "completed_epochs": 200,
+    "num_images": 50000,
+    "paper_fid": 4.37,
+    "paper_source": "https://arxiv.org/html/2511.13720v2#S5.T6",
+    "our_fid": null,
+    "delta": null,
+    "status": "pending",
+    "reason": "Waiting for completed paper-protocol FID-50K"
+  },
+  {
+    "gpu_count": 4,
+    "run": "l16_4gpu_200ep",
+    "model": "JiT-L/16",
+    "resolution": 256,
+    "completed_epochs": 200,
+    "num_images": 50000,
+    "paper_fid": 2.79,
+    "paper_source": "https://arxiv.org/html/2511.13720v2#S5.T6",
+    "our_fid": null,
+    "delta": null,
+    "status": "pending",
+    "reason": "Waiting for completed paper-protocol FID-50K"
+  }
+]

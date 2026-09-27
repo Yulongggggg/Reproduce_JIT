@@ -1,11 +1,11 @@
 {
-  "updated_utc": "2026-09-27T14:36:37.494802+00:00",
+  "updated_utc": "2026-09-27T14:56:06.475255+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
-      "completed_epochs": 108,
+      "completed_epochs": 109,
       "target_epochs": 200,
-      "global_step": 135108,
+      "global_step": 136359,
       "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/b16_4gpu_200ep/checkpoint-last.pth",
       "checkpoint_completed_epochs": 105,
       "checkpoint_global_step": 131355,

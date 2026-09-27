@@ -1,0 +1,53 @@
+{
+  "policy": "jit-paper-v2-ema-cfg-search-8k-final-50k",
+  "paper_source": "https://arxiv.org/html/2511.13720v2#A1",
+  "selection_num_images": 8000,
+  "final_num_images": 50000,
+  "trigger_completed_epochs": 200,
+  "class_num": 1000,
+  "final_samples_per_class": 50,
+  "ema_candidates": [
+    0.9996,
+    0.9998,
+    0.9999
+  ],
+  "cfg_candidates": [
+    1.0,
+    1.1,
+    1.2,
+    1.3,
+    1.4,
+    1.5,
+    1.6,
+    1.7,
+    1.8,
+    1.9,
+    2.0,
+    2.1,
+    2.2,
+    2.3,
+    2.4,
+    2.5,
+    2.6,
+    2.7,
+    2.8,
+    2.9,
+    3.0,
+    3.1,
+    3.2,
+    3.3,
+    3.4,
+    3.5,
+    3.6,
+    3.7,
+    3.8,
+    3.9,
+    4.0
+  ],
+  "fixed_cfg": {
+    "JiT-B/16": 2.9,
+    "JiT-L/16": 2.4
+  },
+  "rollout_note": "Runner loads at job start; queued continuation jobs read the updated evaluation code.",
+  "report_publication": "automatic after each completed 50K stage; push failures recorded in run/report_publish.json"
+}

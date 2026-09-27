@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import sys
 import time
+from evaluation_protocol import protocol_for, run_final_evaluations, validate_metric
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'vendor/JiT'))
@@ -125,8 +126,29 @@ def evaluate(model, args, decay, cfg, count, phase, epoch):
     output = Path(args.output_dir)
     key = f'{phase}-ep{epoch:03d}-ema{decay}-cfg{cfg:.1f}-n{count}'
     result_file = output / 'evaluations' / (key + '.json')
-    if result_file.exists():
-        return json.loads(result_file.read_text())
+    protocol = protocol_for(vars(args))
+    checkpoint = output / f'checkpoint-{epoch:03d}.pth'
+    if not checkpoint.exists():
+        checkpoint = output / 'checkpoint-last.pth'
+    stat = checkpoint.stat()
+    checkpoint_identity = {'file': checkpoint.name, 'bytes': stat.st_size,
+                           'mtime_ns': stat.st_mtime_ns}
+    cached = None
+    if rank == 0 and result_file.exists():
+        try:
+            cached = json.loads(result_file.read_text())
+            validate_metric(cached, {**vars(args), 'epochs': epoch}, count=count)
+            if any(cached.get(k) != v for k, v in {
+                'ema': decay, 'cfg': cfg, 'seed': args.seed, 'world_size': world,
+                'gen_bsz': args.gen_bsz, 'checkpoint_identity': checkpoint_identity}.items()):
+                raise ValueError('Cached result uses a different checkpoint or generation setting')
+        except (ValueError, KeyError, TypeError) as error:
+            print(f'Recomputing {key}: {error}', flush=True)
+            cached = None
+    objects = [cached]
+    dist.broadcast_object_list(objects, src=0)
+    if objects[0] is not None:
+        return objects[0]
     folder = output / 'generated' / key
     if rank == 0:
         folder.mkdir(parents=True, exist_ok=True)
@@ -164,6 +186,10 @@ def evaluate(model, args, decay, cfg, count, phase, epoch):
             result = {'phase': phase, 'completed_epochs': epoch, 'ema': decay, 'cfg': cfg,
                       'num_images': count, 'seed': args.seed, 'world_size': world,
                       'gen_bsz': args.gen_bsz, 'seconds': time.monotonic() - start_time,
+                      'model': args.model, 'resolution': args.img_size,
+                      'samples_per_class': labels_per_class,
+                      'evaluation_protocol': protocol,
+                      'checkpoint_identity': checkpoint_identity,
                       **{k: float(v) for k, v in metrics.items()}}
             # Retain fixed samples across classes for the final report, then reclaim PNG space.
             if phase == 'final':
@@ -359,20 +385,31 @@ def main():
             writer.close()
     else:
         assert start_epoch == args.epochs, 'Final evaluation requires the completed 200-epoch checkpoint'
-    # Hold each model's official CFG fixed; select EMA on 8K then report FID-50K.
-    ema_results = []
-    for decay in (0.9996, 0.9998, 0.9999):
-        ema_results.append(evaluate(model, args, decay, args.cfg, 8000, 'ema-select', args.epochs))
-    best = min(ema_results, key=lambda r: r['frechet_inception_distance'])
-    finals = [evaluate(model, args, best['ema'], args.cfg, 50000, 'final', args.epochs)]
-    issue56 = None
-    if args.model == 'JiT-B/16':
-        issue56 = evaluate(model, args, 0.9996, args.issue56_cfg, 50000, 'issue56', args.epochs)
-    if rank == 0:
-        atomic_json(output / 'summary.json', {'status': 'complete', 'completed_epochs': args.epochs,
-                    'model': args.model, 'resolution': args.img_size, 'official_cfg': args.cfg,
-                    'ema_selection_on_8k_at_fixed_official_cfg': best,
-                    'final_50k_official_cfg': finals, 'issue56_diagnostic_50k': issue56})
+    def save_summary(summary):
+        if rank == 0:
+            atomic_json(output / 'summary.json', summary)
+            # Publish durable evidence at each completed 50K stage. Publishing failure
+            # must not discard an evaluation or fail a GPU allocation.
+            try:
+                published = subprocess.run(['bash', str(ROOT / 'scripts/publish.sh')],
+                    cwd=ROOT, timeout=240, check=False)
+                publication = {'returncode': published.returncode}
+            except (OSError, subprocess.TimeoutExpired) as error:
+                publication = {'error': str(error)}
+            atomic_json(output / 'report_publish.json', {
+                'updated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                **publication})
+            print(f'Report publication: {publication}', flush=True)
+        dist.barrier()
+
+    def save_selection(selection):
+        if rank == 0:
+            atomic_json(output / 'evaluation_selection.json', selection)
+
+    run_final_evaluations(vars(args),
+        lambda decay, cfg, count, phase, epoch: evaluate(
+            model, args, decay, cfg, count, phase, epoch),
+        save_summary, save_selection)
     dist.destroy_process_group()
 
 
