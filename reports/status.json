@@ -1,15 +1,15 @@
 {
-  "updated_utc": "2026-09-26T18:15:47.030795+00:00",
+  "updated_utc": "2026-09-27T03:31:26.314104+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
-      "completed_epochs": 42,
+      "completed_epochs": 85,
       "target_epochs": 200,
-      "global_step": 52542,
+      "global_step": 106335,
       "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/b16_4gpu_200ep/checkpoint-last.pth",
-      "checkpoint_completed_epochs": 40,
-      "checkpoint_global_step": 50040,
-      "checkpoint_updated_utc": "2026-09-26T14:51:25.726965+00:00"
+      "checkpoint_completed_epochs": 85,
+      "checkpoint_global_step": 106335,
+      "checkpoint_updated_utc": "2026-09-27T03:20:58.698031+00:00"
     },
     "l16": {
       "completed_epochs": 0,
@@ -54,7 +54,7 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101980,
-    "pipeline_note": "2026-09-26\uff1a\u4f5c\u4e1a 101980 \u5df2\u5728 alphagpu07 \u7684 4 \u5f20 H100 \u4e0a\u6062\u590d\u8bad\u7ec3\uff0c\u5e76\u5b8c\u6574\u8dd1\u8fc7\u6b64\u524d\u5931\u8d25\u7684\u7b2c 41 \u8f6e\u4ee5\u53ca\u4e0b\u4e00\u8f6e\u3002\u5b9e\u65f6\u5df2\u5b8c\u6210\u8f6e\u6570\u89c1\u672c\u62a5\u544a\u7684\u8bad\u7ec3\u65e5\u5fd7\u8fdb\u5ea6\uff1b\u6bcf 5 \u8f6e\u4fdd\u5b58\u7684\u68c0\u67e5\u70b9\u5355\u72ec\u5217\u51fa\u3002effective batch=1024\u3001LR=2e-4\u3001B/16 CFG=2.9\u3002L/16 \u5c06\u5728 B/16 \u5b8c\u6210\u540e\u5f00\u59cb\u3002",
+    "pipeline_note": "2026-09-26 23:30 EDT\uff1a4 \u5361 B/16 \u4f5c\u4e1a 101980 \u5728 alphagpu07 \u5df2\u8fde\u7eed\u7eed\u8dd1\u8fd1 10 \u5c0f\u65f6\uff0c\u5b8c\u6210 85 \u8f6e\u5e76\u8fdb\u5165\u7b2c 86 \u8f6e\uff0c85-epoch \u68c0\u67e5\u70b9\u5df2\u4fdd\u5b58\uff0c\u672a\u518d\u51fa\u73b0\u5148\u524d\u7684\u6570\u636e\u52a0\u8f7d\u9519\u8bef\u3002\u7b2c 80 \u8f6e FID-8K=12.8535\uff08CFG 2.9\u3001EMA 0.9996\uff09\u3002L/16 \u5c1a\u672a\u5f00\u59cb\u30028 \u5361\u4f5c\u4e1a 99841 \u4ecd\u6392\u961f\u3002\u5f53\u524d\u6bb5\u65f6\u9650\u5230 9 \u6708 27 \u65e5 01:38:42 EDT\uff0c\u4e4b\u540e\u7531\u4f9d\u8d56\u4f5c\u4e1a\u7eed\u8dd1\uff0c\u6392\u961f\u95f4\u9694\u5c1a\u4e0d\u786e\u5b9a\u3002",
     "active_train_job_id": 101980
   }
 }
