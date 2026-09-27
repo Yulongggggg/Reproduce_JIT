@@ -1,15 +1,15 @@
 {
-  "updated_utc": "2026-09-27T14:56:06.475255+00:00",
+  "updated_utc": "2026-09-27T20:27:48.225848+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
-      "completed_epochs": 109,
+      "completed_epochs": 123,
       "target_epochs": 200,
-      "global_step": 136359,
+      "global_step": 153873,
       "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/b16_4gpu_200ep/checkpoint-last.pth",
-      "checkpoint_completed_epochs": 105,
-      "checkpoint_global_step": 131355,
-      "checkpoint_updated_utc": "2026-09-27T13:23:20.795975+00:00"
+      "checkpoint_completed_epochs": 120,
+      "checkpoint_global_step": 150120,
+      "checkpoint_updated_utc": "2026-09-27T18:59:10.640016+00:00"
     },
     "l16": {
       "completed_epochs": 0,
@@ -54,7 +54,7 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101982,
-    "pipeline_note": "2026-09-27 10:33 EDT\uff1a\u4f5c\u4e1a 101980 \u8fbe\u5230 12 \u5c0f\u65f6\u65f6\u9650\u540e\u4e8e 01:39 \u7ed3\u675f\uff0c101981 \u4e8e 05:38 \u5728 alphagpu16 \u81ea\u52a8\u4ece 95-epoch \u68c0\u67e5\u70b9\u7eed\u8dd1\u3002\u76ee\u524d\u65e5\u5fd7\u5b8c\u6210 108 \u8f6e\u3001\u6b63\u5728\u7b2c 109 \u8f6e\uff0c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u4e3a 105 \u8f6e\uff1b\u672a\u89c1\u65b0\u7684\u6570\u636e\u52a0\u8f7d\u9519\u8bef\u3002\u6700\u8fd1 5 \u8f6e\u5e73\u5747 22.2 \u5206\u949f\uff0c\u6162\u4e8e\u4e0a\u4e00\u8282\u70b9\u7684\u7ea6 12.4 \u5206\u949f\uff0c\u5269\u4f59\u7ea6 34 \u5c0f\u65f6\u7eaf\u8bad\u7ec3\uff08\u53e6\u52a0\u8bc4\u4f30\u548c\u6392\u961f\uff09\u3002\u56db\u5f20 H100 \u7684\u53ea\u8bfb\u91c7\u6837\u663e\u793a GPU \u5229\u7528\u7387 99\u2013100%\u3001\u65f6\u949f\u7ea6 1.9 GHz\uff0c\u5177\u4f53\u964d\u901f\u539f\u56e0\u5c1a\u672a\u786e\u5b9a\u3002L/16 \u672a\u5f00\u59cb\uff0c8 \u5361\u4f5c\u4e1a 99841 \u4ecd\u6392\u961f\u3002\u4e0b\u4e00\u6b21\u4e2d\u9014\u8bc4\u4f30\u5728 120 \u8f6e\u3002",
+    "pipeline_note": "2026-09-27 16:24 EDT\uff1a\u4f5c\u4e1a 101981 \u5728 alphagpu16 \u4f7f\u7528 4 \u5f20 H100 \u6301\u7eed\u8bad\u7ec3\uff1b\u65e5\u5fd7\u5b8c\u6210 123/200 \u8f6e\uff0c\u53ef\u6062\u590d\u68c0\u67e5\u70b9 120 \u8f6e\u3002\u6700\u8fd1 5 \u8f6e\u5e73\u5747 22.2 \u5206\u949f\uff0c\u5269\u4f59\u7eaf\u8bad\u7ec3\u7ea6 28.5 \u5c0f\u65f6\u3002120 \u8f6e FID-8K=9.9013\uff08CFG=2.9\uff0cEMA=0.9996\uff09\uff0c80 \u8f6e\u4e3a 12.8535\uff1b\u6ca1\u6709\u6b63\u5f0f FID-50K \u7ed3\u679c\u3002\u6b64\u6b21 8K \u8bc4\u4f30\u8017\u65f6 14.2 \u5206\u949f\uff0c\u82e5\u6700\u7ec8\u4ecd\u4fdd\u6301\u8be5\u901f\u5ea6\uff0c93 \u7ec4\u641c\u7d22\u7ea6 21.9 \u5c0f\u65f6\uff0c\u53e6\u52a0 2\u20133 \u6b21 50K \u7ea6 2.9\u20134.4 \u5c0f\u65f6\uff1b\u8fd9\u662f\u6309\u56fe\u7247\u6570\u5916\u63a8\u7684\u7c97\u4f30\uff0c\u8282\u70b9\u3001\u7f16\u8bd1\u3001I/O \u548c\u6307\u6807\u8ba1\u7b97\u4f1a\u5f71\u54cd\u5b9e\u9645\u8017\u65f6\u300212 \u5c0f\u65f6\u65f6\u9650\u540e\u7531\u4f5c\u4e1a 101982 \u81ea\u52a8\u7eed\u8dd1\uff0c\u6392\u961f\u4e0e\u68c0\u67e5\u70b9\u56de\u9000\u53e6\u8ba1\u3002L/16 \u5c1a\u672a\u5f00\u59cb\uff0c8 \u5361\u4f5c\u4e1a 99841 \u4ecd\u5728 Priority \u6392\u961f\u3002",
     "active_train_job_id": 101981,
     "last_timed_out_job_id": 101980
   }
