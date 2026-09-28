@@ -15,5 +15,10 @@
   "comparison_images": 50000,
   "official_100_epoch_reference": null,
   "requires": "login host and user systemd service running; Codex daemon reachable",
-  "scheduler_query_error": "[Errno 2] No such file or directory: 'squeue'"
+  "scheduler_query_verified_utc": "2026-09-28T18:51:01.800668+00:00",
+  "scheduler_path_fix": {
+    "previous_error": "[Errno 2] No such file or directory: 'squeue'",
+    "slurm_bin": "/cm/shared/apps/slurm/current/bin",
+    "validation": "User systemd service with corrected PATH successfully refreshed squeue and sacct; existing timer remains active."
+  }
 }
