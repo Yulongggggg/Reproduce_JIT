@@ -68,12 +68,19 @@ def main():
             writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n'); writer.writeheader(); writer.writerows(rows)
     text = [f'# JiT 官方配置复现实验报告\n\n更新时间：{stamp}',
             f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；检查点每 5 轮保存，异常退出后从检查点恢复：']
+    waiting = ' PENDING ' in queue and ' RUNNING ' not in queue and len(complete) < len(MODELS)
+    if waiting:
+        text.append('**当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。')
+    schedule = read(REPORTS/'report_schedule.json')
+    if schedule:
+        text.append(f'自动汇报：每 6 小时在本对话和 GitHub 更新（美东 {schedule["calendar"]}），状态 `{schedule["status"]}`；下一次计划时间：{schedule.get("next_report_local") or "任务已完成"}。定时器所在登录主机需保持运行。')
     text.extend([f'- JiT-{m[0].upper()}/{m[1:]}：训练日志已完成 {progress[m]["completed_epochs"]}/200 epochs；可恢复检查点为第 {progress[m]["checkpoint_completed_epochs"]} 轮。' for m in MODELS])
     for m in MODELS:
         recent = [r for r in rows if r['model'] == m][-5:]
         if recent:
             seconds = sum(r['seconds'] for r in recent) / len(recent)
-            left = max(0, 200 - progress[m]['completed_epochs']) * seconds / 3600
+            restart_epoch = progress[m]['checkpoint_completed_epochs'] if waiting else progress[m]['completed_epochs']
+            left = max(0, 200 - restart_epoch) * seconds / 3600
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 最近 {len(recent)} 个 epoch 平均 {seconds/60:.1f} 分钟；剩余训练约 {left:.1f} 小时，不含评估、重试和排队。')
         monitors = [read(p) for p in (runs[m]/'evaluations').glob('monitor-*.json')]
         if monitors:
@@ -99,6 +106,7 @@ def main():
              '训练超参、批量和累积步数见 [`configs/`](../configs/)。B/L 的 dropout 为 0，P_mean=-0.8、P_std=0.8、t_eps=0.05、label drop=0.1、noise scale=1。4 卡等效设置和数值复现的边界见 [说明](four_gpu_equivalence.md)。',
              '\n## 同 epoch、论文评估流程的 FID-50K 对照',
              f'官方基准来自 [论文 Table 6]({PAPER_URL}#S5.T6)，均为 200 epochs、256²、FID-50K。本文 40/80/120/160 epoch 的 8K 监测值不参与该表；论文未提供这些轮数的可直接对照值。',
+             '未找到 B/16、L/16 可直接对照的官方 100 epoch FID-50K；100 epoch checkpoint 保留，但正式对照选择论文明确公布的 200 epoch。没有真实 50K 结果时，不判断是否已接近官方。',
              '两边使用 1000 类、每类 50 张生成图片，对 ImageNet 训练集计算 FID。复现使用作者发布的 `jit_in256_stats.npz`、锁定的 torch-fidelity、50-step Heun、CFG interval [0.1,1.0]。评估 JSON 记录统计文件 SHA-256、后端 commit、CFG、EMA、epoch 和 checkpoint 标识。论文数值来自原实现；按公开 PyTorch 代码对齐评估流程，不承诺逐位一致。',
              '| 模型 | epoch（双方） | 分辨率 | 官方 FID-50K | 本次 FID-50K | 本次 CFG / EMA | 差值 |',
              '|---|---:|---:|---:|---:|---|---:|']

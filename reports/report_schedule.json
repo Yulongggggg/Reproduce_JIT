@@ -1,0 +1,20 @@
+{
+  "status": "active",
+  "interval_hours": 6,
+  "timezone": "America/New_York",
+  "calendar": "02:30, 08:30, 14:30, 20:30",
+  "host": "alpha1",
+  "systemd_timer": "jit-report-6h.timer",
+  "installed_utc": "2026-09-28T12:44:02.195151+00:00",
+  "next_report_local": "2026-09-28T14:30:00-04:00",
+  "destinations": [
+    "existing Codex conversation",
+    "GitHub reports/REPORT.md"
+  ],
+  "comparison_epoch": 200,
+  "comparison_images": 50000,
+  "official_100_epoch_reference": null,
+  "requires": "login host and user systemd service running; Codex daemon reachable",
+  "notification_test": "passed: existing chat accepted the test message",
+  "verified_utc": "2026-09-28T12:51:38.766527+00:00"
+}

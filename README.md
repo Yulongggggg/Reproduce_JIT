@@ -34,6 +34,14 @@ H/32, 512², CFG 2.3
 
 93 组搜索共需生成 744K 图片，评估时间需另计；每组结果单独保存，超时后复用。8K 是监测/选参分数，正式对照全部使用 50K。固定 CFG 表不声称与论文的搜索流程相同。报告推送失败不会中断训练，错误写入各运行目录的 `report_publish.json`。
 
+## 每 6 小时汇报
+
+`jit-report-6h.timer` 在登录主机的用户 systemd 服务中运行，美东时间每天 **02:30、08:30、14:30、20:30** 调用 `scripts/report_tick.py`。它刷新 Slurm 状态、推送 GitHub 报告，并通过 `codex queue` 唤起当前对话汇报；不提交或取消训练作业。服务器和 Codex 服务需要保持可用。失败后每 5 分钟重试，已成功的消息投递不会在同一时段重复发送。B/16、L/16 均完成 200 epoch 和经校验的 FID-50K 后自动停止。
+
+使用 `systemctl --user list-timers jit-report-6h.timer` 查看下次执行时间；使用 `systemctl --user disable --now jit-report-6h.timer` 停止。对话标识、投递回执保存在被 Git 忽略的 `artifacts/`；公开状态见 `reports/report_schedule.json`。
+
+没有找到上述两个模型可直接对照的官方 100 epoch FID-50K，因此正式比较统一使用 200 epoch，不能用 100 epoch 或 FID-8K 冒充同设置对照。
+
 ## 运行与恢复
 
 ```bash

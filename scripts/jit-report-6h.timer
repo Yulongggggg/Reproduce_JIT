@@ -1,0 +1,11 @@
+[Unit]
+Description=Report JiT progress every six hours
+
+[Timer]
+OnCalendar=*-*-* 02,08,14,20:30:00 America/New_York
+Persistent=true
+AccuracySec=1min
+Unit=jit-report-6h.service
+
+[Install]
+WantedBy=timers.target
