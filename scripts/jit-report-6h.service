@@ -5,7 +5,7 @@ Description=JiT six-hour GitHub report and current-chat update
 Type=oneshot
 WorkingDirectory=/mnt/home/yliu5/Reproduce_JIT
 ExecStart=/mnt/home/yliu5/Reproduce_JIT/.env/bin/python /mnt/home/yliu5/Reproduce_JIT/scripts/report_tick.py
-Environment=PATH=/mnt/home/yliu5/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PATH=/cm/shared/apps/slurm/current/bin:/mnt/home/yliu5/.local/bin:/usr/local/bin:/usr/bin:/bin
 TimeoutStartSec=9min
 Restart=on-failure
 RestartSec=5min
