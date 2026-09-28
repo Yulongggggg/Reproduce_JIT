@@ -1,20 +1,18 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-28T18:25:59.162060+00:00
+更新时间：2026-09-28T18:30:11.271466+00:00
 
 ## 当前进度
 
 **已完成训练与最终评估：0/2。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；检查点每 5 轮保存，异常退出后从检查点恢复：
 
-**当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。
-
-自动汇报：每 6 小时在本对话和 GitHub 更新（美东 02:30, 08:30, 14:30, 20:30），状态 `active`；下一次计划时间：2026-09-28T14:30:00-04:00。定时器所在登录主机需保持运行。
+自动汇报：每 6 小时在本对话和 GitHub 更新（美东 02:30, 08:30, 14:30, 20:30），状态 `active`；下一次计划时间：2026-09-28T20:30:00-04:00。定时器所在登录主机需保持运行。
 
 - JiT-B/16：训练日志已完成 157/200 epochs；可恢复检查点为第 155 轮。
 
 - JiT-L/16：训练日志已完成 0/200 epochs；可恢复检查点为第 0 轮。
 
-JiT-B/16 最近 5 个 epoch 平均 22.3 分钟；剩余训练约 16.7 小时，不含评估、重试和排队。
+JiT-B/16 最近 5 个 epoch 平均 22.3 分钟；剩余训练约 16.0 小时，不含评估、重试和排队。
 
 JiT-B/16 第 120 epoch 中途评估：FID-8000=9.9013，CFG=2.9，EMA=0.9996。这是中途 8K 指标，不能作为最终 FID-50K 结果。
 
@@ -27,18 +25,7 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-101983 jit_b16_l16_4gpu PENDING (Priority)
-101994 jit_b16_l16_4gpu PENDING (Dependency)
-101993 jit_b16_l16_4gpu PENDING (Dependency)
-101992 jit_b16_l16_4gpu PENDING (Dependency)
-101991 jit_b16_l16_4gpu PENDING (Dependency)
-101990 jit_b16_l16_4gpu PENDING (Dependency)
-101989 jit_b16_l16_4gpu PENDING (Dependency)
-101988 jit_b16_l16_4gpu PENDING (Dependency)
-101987 jit_b16_l16_4gpu PENDING (Dependency)
-101986 jit_b16_l16_4gpu PENDING (Dependency)
-101985 jit_b16_l16_4gpu PENDING (Dependency)
-101984 jit_b16_l16_4gpu PENDING (Dependency)
+当前无法查询调度器；请查阅 jobs_4gpu.json
 ```
 
 流水线记录：2026-09-28 14:25 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101983 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
