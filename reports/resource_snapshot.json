@@ -1,5 +1,5 @@
 {
-  "checked_utc": "2026-09-29T14:18:07.947043+00:00",
+  "checked_utc": "2026-09-29T18:31:45.334160+00:00",
   "source": "scontrol show nodes -o and squeue; GPU allocation counts, not utilization",
   "gpu_nodes": 28,
   "total_gpus": 224,
@@ -48,7 +48,7 @@
       "total_gpus": 8,
       "allocated_gpus": 8,
       "cpu_total": 96,
-      "cpu_allocated": 50
+      "cpu_allocated": 66
     },
     {
       "node": "alphagpu06",
@@ -75,7 +75,7 @@
       "total_gpus": 8,
       "allocated_gpus": 8,
       "cpu_total": 96,
-      "cpu_allocated": 56
+      "cpu_allocated": 64
     },
     {
       "node": "alphagpu09",
@@ -129,7 +129,7 @@
       "total_gpus": 8,
       "allocated_gpus": 8,
       "cpu_total": 96,
-      "cpu_allocated": 50
+      "cpu_allocated": 66
     },
     {
       "node": "alphagpu15",
@@ -183,7 +183,7 @@
       "total_gpus": 8,
       "allocated_gpus": 8,
       "cpu_total": 96,
-      "cpu_allocated": 40
+      "cpu_allocated": 72
     },
     {
       "node": "alphagpu21",
@@ -237,7 +237,7 @@
       "total_gpus": 8,
       "allocated_gpus": 8,
       "cpu_total": 144,
-      "cpu_allocated": 64
+      "cpu_allocated": 72
     },
     {
       "node": "alphagpu53",
@@ -255,14 +255,14 @@
       "total_gpus": 8,
       "allocated_gpus": 8,
       "cpu_total": 144,
-      "cpu_allocated": 72
+      "cpu_allocated": 64
     }
   ],
   "candidate_queue": [
-    "107752|jit_l16_split|PENDING|priority|2|gres:gpu:2|(Priority)|2026-09-29T16:04:34",
-    "107750|jit_b16_split|PENDING|priority|2|gres:gpu:2|(Priority)|2026-09-29T14:36:22",
-    "107751|jit_l16_single|PENDING|priority|1|gres:gpu:4|(Priority)|2026-09-29T17:35:00",
-    "101984|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Priority)|2026-09-29T20:35:00",
+    "107752|jit_l16_split|PENDING|priority|2|gres:gpu:2|(Priority)|2026-09-29T15:27:39",
+    "107750|jit_b16_split|PENDING|priority|2|gres:gpu:2|(Priority)|2026-09-29T15:03:45",
+    "107751|jit_l16_single|PENDING|priority|1|gres:gpu:4|(Priority)|2026-09-29T15:27:39",
+    "101984|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Priority)|2026-09-29T17:31:24",
     "101994|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Dependency)|N/A",
     "101993|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Dependency)|N/A",
     "101992|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Dependency)|N/A",
@@ -274,6 +274,6 @@
     "101986|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Dependency)|N/A",
     "101985|jit_b16_l16_4gpu|PENDING|priority|1|gres:gpu:4|(Dependency)|N/A"
   ],
-  "policy": "Keep four ranks and global batch 1024; H100/H200 single-node or two-node; priority QoS, 3-12 h backfill; model lock; checkpoint every epoch.",
+  "policy": "Four total GPUs/ranks and batch 1024. B16 flexible minimum 2h; L16 minimum 3h; original chain default 3h with current entry 101984 lowered to 2h. All maximum 12h. Model locks and per-epoch checkpoints.",
   "validation": "Slurm test-only and actual submitted job definitions verified; 16 CPU tests passed. Multi-node CUDA/NCCL run awaits allocation."
 }
