@@ -28,10 +28,10 @@
   ],
   "last_failed_job_id": 101979,
   "next_train_job_id": 101984,
-  "pipeline_note": "2026-09-29 00:20 EDT 自动检查：正在运行：101983 (alphagpu20)。 训练历史最大轮数和可恢复检查点分别列出。",
+  "pipeline_note": "2026-09-29 02:30 EDT 自动检查：正在运行：101983 (alphagpu20)。 训练历史最大轮数和可恢复检查点分别列出。",
   "active_train_job_id": 101983,
   "last_timed_out_job_id": 101982,
-  "queue_checked_utc": "2026-09-29T04:20:37.900248+00:00",
+  "queue_checked_utc": "2026-09-29T06:30:38.267981+00:00",
   "queue_snapshot": {
     "107752": {
       "state": "PENDING",
