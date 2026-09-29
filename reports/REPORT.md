@@ -1,24 +1,28 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-29T02:09:04.857796+00:00
+更新时间：2026-09-29T02:40:17.791932+00:00
 
 ## 当前进度
 
-**已完成训练与最终评估：0/2。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；检查点每 5 轮保存，异常退出后从检查点恢复：
+**已完成训练与最终评估：0/2。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；此前每 5 轮保存，新增资源候选后四卡训练每轮保存，异常退出后从检查点恢复：
 
 **当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。
 
 自动汇报：每 6 小时在本对话和 GitHub 更新（美东 02:30, 08:30, 14:30, 20:30），状态 `active`；下一次计划时间：2026-09-29T02:30:00-04:00。定时器所在登录主机需保持运行。
 
-- JiT-B/16：训练日志已完成 157/200 epochs；可恢复检查点为第 155 轮。
+- JiT-B/16：训练历史日志最高完成 157/200 epochs；可恢复检查点为第 155 轮。
 
-- JiT-L/16：训练日志已完成 0/200 epochs；可恢复检查点为第 0 轮。
+- JiT-L/16：训练历史日志最高完成 0/200 epochs；可恢复检查点为第 0 轮。
 
 JiT-B/16 最近 5 个 epoch 平均 22.3 分钟；剩余训练约 16.7 小时，不含评估、重试和排队。
 
 JiT-B/16 第 120 epoch 中途评估：FID-8000=9.9013，CFG=2.9，EMA=0.9996。这是中途 8K 指标，不能作为最终 FID-50K 结果。
 
-8 卡实验仍使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。
+按用户最新要求，全部训练任务均为总计四卡。遗留八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。
+
+资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点，候选申请 3–12 小时以利用短空档；失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。
+
+资源检查快照（2026-09-29T02:28:15.172143+00:00）：28 台 GPU 节点共 224 卡，其中 223 卡已被 Slurm 分配。这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。双节点任务已通过 Slurm 配置检查，CUDA/NCCL 实际运行仍待分配资源验证。
 
 GPU smoke：passed，NVIDIA H100 80GB HBM3。
 
@@ -28,6 +32,9 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 Slurm 队列：
 ```text
 101983 jit_b16_l16_4gpu PENDING (Priority)
+107752 jit_l16_split PENDING (Priority)
+107750 jit_b16_split PENDING (Priority)
+107751 jit_l16_single PENDING (Priority)
 101994 jit_b16_l16_4gpu PENDING (Dependency)
 101993 jit_b16_l16_4gpu PENDING (Dependency)
 101992 jit_b16_l16_4gpu PENDING (Dependency)
@@ -41,11 +48,11 @@ Slurm 队列：
 101984 jit_b16_l16_4gpu PENDING (Dependency)
 ```
 
-流水线记录：2026-09-28 22:09 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101983 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
+流水线记录：2026-09-28 22:40 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101983 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
 
 ## 预注册设置
 
-当前按用户要求先训练 JiT-B/16、JiT-L/16；每个模型从头训练 200 epochs，AdamW、实际 LR=2e-4、全局有效 batch=1024、5 epoch warmup、constant LR。4 张卡时 B/16 每卡 batch 128、累积 2 次；L/16 每卡 batch 64、累积 4 次。
+当前按用户要求优先训练 JiT-B/16、JiT-L/16，各 200 epochs；B/16 从已有检查点续跑，L/16 独立排队。AdamW、实际 LR=2e-4、全局有效 batch=1024、5 epoch warmup、constant LR。4 张卡时 B/16 每卡 batch 128、累积 2 次；L/16 每卡 batch 64、累积 4 次。
 
 固定 CFG 和分辨率：B/16 256² CFG 2.9（官方；另测 issue #56 的 CFG 3.6、EMA 0.9996）；L/16 256² CFG 2.4。CFG interval 均为 [0.1,1.0]，ODE solver 为 50-step Heun。
 
@@ -85,7 +92,7 @@ Slurm 队列：
 
 上游 JiT 与定制 torch-fidelity 使用锁定 submodule；原模型、denoiser、loss 和 attention 保持上游实现。环境锁、GPU smoke 和数据验证记录见本目录。
 
-训练保存 checkpoint、三组 EMA、优化器和各 rank RNG，每 5 epochs 保存一次；本轮执行顺序为 B/16、L/16。
+训练保存 checkpoint、三组 EMA、优化器和各 rank RNG。此前每 5 epochs 保存，增加短时段候选后四卡训练每 epoch 保存；B/16、L/16 可独立并行。
 
 200 epoch 是目标训练预算；FID 使用 1000 类均衡的 50K 样本。8K 用于训练监测和 EMA/CFG 选择，不代替正式结果。
 

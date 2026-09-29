@@ -28,12 +28,24 @@
   ],
   "last_failed_job_id": 101979,
   "next_train_job_id": 101983,
-  "pipeline_note": "2026-09-28 22:09 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101983 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。",
+  "pipeline_note": "2026-09-28 22:40 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101983 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。",
   "active_train_job_id": null,
   "last_timed_out_job_id": 101982,
-  "queue_checked_utc": "2026-09-29T02:09:04.366213+00:00",
+  "queue_checked_utc": "2026-09-29T02:40:17.297749+00:00",
   "queue_snapshot": {
     "101983": {
+      "state": "PENDING",
+      "node_or_reason": "(Priority)"
+    },
+    "107752": {
+      "state": "PENDING",
+      "node_or_reason": "(Priority)"
+    },
+    "107750": {
+      "state": "PENDING",
+      "node_or_reason": "(Priority)"
+    },
+    "107751": {
       "state": "PENDING",
       "node_or_reason": "(Priority)"
     },
@@ -81,5 +93,11 @@
       "state": "PENDING",
       "node_or_reason": "(Dependency)"
     }
-  }
+  },
+  "active_train_job_ids": [],
+  "additional_job_ids": [
+    107750,
+    107751,
+    107752
+  ]
 }

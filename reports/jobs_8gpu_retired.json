@@ -1,0 +1,32 @@
+{
+  "status": "cancelled",
+  "reason": "User explicitly requires all training jobs to use four GPUs total.",
+  "verified_utc": "2026-09-29T02:33:46.286052+00:00",
+  "job_ids": [
+    99841,
+    99842,
+    99843,
+    99844,
+    99845,
+    99846,
+    100033,
+    100034,
+    100035,
+    100036
+  ],
+  "verified_states": {
+    "99841": "CANCELLED",
+    "99842": "CANCELLED",
+    "99843": "CANCELLED",
+    "99844": "CANCELLED",
+    "99845": "CANCELLED",
+    "99846": "CANCELLED",
+    "100033": "CANCELLED",
+    "100034": "CANCELLED",
+    "100035": "CANCELLED",
+    "100036": "CANCELLED"
+  },
+  "verification": "squeue returned no remaining jobs; sacct confirmed all ten CANCELLED.",
+  "preserved": "All four-GPU jobs, datasets, checkpoints, and historical configurations.",
+  "gpu_count_policy": 4
+}
