@@ -43,6 +43,28 @@ class ResourceQueueTests(unittest.TestCase):
                 self.assertEqual(call.call_count, 1)
                 self.assertEqual(call.call_args.args[0][0], 'squeue')
 
+    def test_split_launcher_uses_tcp_on_both_nodes_and_preserves_four_ranks(self):
+        # Execute the real shell entrypoint without requesting GPUs or importing CUDA.
+        with tempfile.TemporaryDirectory() as directory:
+            launcher = Path(directory)/'torchrun'
+            launcher.write_text(f'#!{sys.executable}\n'
+                'import json, os, sys\n'
+                'keys = ("NCCL_NET", "NCCL_IB_DISABLE", "JIT_NCCL_PREFLIGHT", "NCCL_P2P_DISABLE")\n'
+                'print(json.dumps({"argv": sys.argv[1:], "env": {k: os.environ.get(k) for k in keys}}))\n')
+            launcher.chmod(0o755)
+            for node in (0, 1):
+                environment = dict(os.environ, PATH=directory+os.pathsep+os.environ['PATH'],
+                    SLURM_NODEID=str(node), JIT_MASTER_ADDR='example-node', JIT_MASTER_PORT='23456',
+                    NCCL_NET='IB', NCCL_IB_DISABLE='0', NCCL_P2P_DISABLE='0')
+                result = json.loads(subprocess.check_output(
+                    ['bash', str(Path(__file__).with_name('torchrun_node.sh')), 'config.json'],
+                    env=environment, text=True))
+                self.assertEqual(result['env'], {'NCCL_NET': 'Socket', 'NCCL_IB_DISABLE': '1',
+                    'JIT_NCCL_PREFLIGHT': '1', 'NCCL_P2P_DISABLE': '0'})
+                self.assertEqual(result['argv'], ['--nnodes=2', '--nproc_per_node=2',
+                    f'--node_rank={node}', '--master_addr=example-node', '--master_port=23456',
+                    'scripts/run.py', '--mode', 'train', '--config', 'config.json'])
+
     def prepare(self, directory):
         root = Path(directory)
         (root/'configs').mkdir()

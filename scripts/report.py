@@ -72,6 +72,24 @@ def main():
     waiting = ' PENDING ' in queue and ' RUNNING ' not in queue and len(complete) < len(MODELS)
     if waiting:
         text.append('**当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。')
+    network_issue = read(REPORTS/'multinode_network_issue.json')
+    network_probes = {m: read(runs[m]/'network_probe.json') for m in MODELS}
+    if network_issue:
+        failures = '；'.join(f'{job["model"]} 作业 {job["job_id"]}（{job["state"]}）'
+                             for job in network_issue['failed_jobs'])
+        text.append(f'**跨节点启动故障：{failures}。** 两个任务在美东 2026-09-29 14:37 先后获分配，'
+                    '各用 4 张 H200（2 节点各 2 卡），均在初始 NCCL barrier 报 '
+                    '`ibv_modify_qp: Invalid argument errno 22`，尚未进入训练，未推进检查点。'
+                    '已仅为双节点入口配置 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket`，'
+                    '下一次分配后先做真实四卡 all-reduce 检查。'
+                    '故障证据与配置范围见 [记录](multinode_network_issue.json)。')
+        for m, probe in network_probes.items():
+            name = f'JiT-{m[0].upper()}/{m[1:]}'
+            if probe and probe.get('status') == 'passed':
+                text.append(f'{name} 通信检查：作业 {probe["slurm_job_id"]} 于 '
+                            f'{probe["updated_utc"]} 通过四卡 collective 检查；这不等于完成训练或评估。')
+            else:
+                text.append(f'{name} TCP 替代方案尚无真实 GPU 验证结果，不能宣称故障已解决。')
     schedule = read(REPORTS/'report_schedule.json')
     if schedule:
         text.append(f'自动汇报：每 6 小时在本对话和 GitHub 更新（美东 {schedule["calendar"]}），状态 `{schedule["status"]}`；下一次计划时间：{schedule.get("next_report_local") or "任务已完成"}。定时器所在登录主机需保持运行。')
@@ -88,7 +106,9 @@ def main():
             model_running = str(metadata.get('slurm_job_id')) in running_ids
             restart_epoch = progress[m]['completed_epochs'] if model_running else progress[m]['checkpoint_completed_epochs']
             left = max(0, 200 - restart_epoch) * seconds / 3600
-            text.append(f'JiT-{m[0].upper()}/{m[1:]} 最近 {len(recent)} 个 epoch 平均 {seconds/60:.1f} 分钟；剩余训练约 {left:.1f} 小时，不含评估、重试和排队。')
+            text.append(f'JiT-{m[0].upper()}/{m[1:]} 最近 {len(recent)} 个已完成 epoch 平均 {seconds/60:.1f} 分钟；'
+                        f'仅在相同吞吐下，剩余训练约 {left:.1f} 小时，不含评估、重试和排队。'
+                        '双节点 TCP 的实际训练速度尚需实测，不能直接沿用单节点耗时。')
         monitors = [read(p) for p in (runs[m]/'evaluations').glob('monitor-*.json')]
         if monitors:
             metric = max(monitors, key=lambda r:r['completed_epochs'])
@@ -98,7 +118,7 @@ def main():
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 第 {selection["completed_epochs"]} epoch 的 EMA/CFG 搜索已完成 {selection["completed_candidates"]}/{selection["total_candidates"]} 组。')
     retired = read(REPORTS/'jobs_8gpu_retired.json')
     if retired:
-        text.append('按用户最新要求，全部训练任务均为总计四卡。遗留八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。')
+        text.append('按用户明确的要求，每个训练任务总计四卡；B/16、L/16 可各用四卡并行。遗留单任务八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。')
     else:
         text.append('8 卡实验使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。')
     if read(REPORTS/'jobs_flexible.json'):
@@ -109,8 +129,7 @@ def main():
                     f'{resource_snapshot["gpu_nodes"]} 台 GPU 节点共 {resource_snapshot["total_gpus"]} 卡，'
                     f'其中 {resource_snapshot["allocated_gpus"]} 卡已被 Slurm 分配。'
                     '这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。'
-                    '详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。'
-                    '双节点任务已通过 Slurm 配置检查，CUDA/NCCL 实际运行仍待分配资源验证。')
+                    '详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。')
     text.append('GPU smoke：'+(f'{smoke["status"]}，{smoke.get("gpu")}' if smoke else '未完成')+'。')
     if not data:
         parts=list((ROOT/'data/imagenet/.download_parts').glob('[0-9]*'))
@@ -246,7 +265,9 @@ def main():
              '每个 50K 阶段完成后自动生成此报告并尝试提交、推送到 GitHub。单组评估结果可断点复用；推送失败记录在运行目录的 `report_publish.json`，不会中断训练。']
     (REPORTS/'REPORT.md').write_text(render_markdown(text))
     (REPORTS/'status.json').write_text(json.dumps({'updated_utc':stamp,'model_progress':progress,
-        'gpu_count':4,'completed_models':complete,'data_ready':bool(data),'smoke':bool(smoke),'complete':len(complete)==len(MODELS),'jobs':jobs},indent=2)+'\n')
+        'gpu_count':4,'gpu_count_per_job':4,'models_may_run_concurrently':True,
+        'network_issue':network_issue,'network_probes':network_probes,
+        'completed_models':complete,'data_ready':bool(data),'smoke':bool(smoke),'complete':len(complete)==len(MODELS),'jobs':jobs},indent=2)+'\n')
 
 
 if __name__=='__main__':

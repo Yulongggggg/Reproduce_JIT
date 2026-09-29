@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import random
 import shutil
+import socket
 import subprocess
 import sys
 import time
@@ -65,7 +66,45 @@ def init_distributed(args):
     dist.init_process_group('nccl', init_method='env://', rank=args.rank,
                             world_size=args.world_size, timeout=datetime.timedelta(hours=1))
     dist.barrier(device_ids=[args.gpu])
+    if os.environ.get('JIT_NCCL_PREFLIGHT') == '1':
+        network_preflight(args)
     misc.setup_for_distributed(args.rank == 0)
+
+
+def network_environment():
+    return {key: os.environ.get(key) for key in
+            ('NCCL_NET', 'NCCL_IB_DISABLE', 'NCCL_SOCKET_IFNAME', 'NCCL_DEBUG')}
+
+
+def network_preflight(args):
+    """Record a real four-GPU collective check before loading/training the model."""
+    assert args.world_size == 4, 'Split candidates must use exactly four GPUs'
+    payload = torch.full((262144,), args.rank + 1, dtype=torch.float32, device='cuda')
+    started = time.monotonic()
+    dist.all_reduce(payload)
+    expected = args.world_size * (args.world_size + 1) // 2
+    if not torch.all(payload == expected).item():
+        raise RuntimeError('NCCL preflight all-reduce returned incorrect values')
+    seconds = time.monotonic() - started
+    peers = [None] * args.world_size
+    dist.all_gather_object(peers, {
+        'rank': args.rank, 'local_rank': args.gpu, 'host': socket.gethostname(),
+        'gpu': torch.cuda.get_device_name(), 'all_reduce_seconds': seconds,
+        'environment': network_environment()})
+    hosts = {peer['host'] for peer in peers}
+    assert len(hosts) == 2 and all(
+        sorted(peer['local_rank'] for peer in peers if peer['host'] == host) == [0, 1]
+        for host in hosts), peers
+    if args.rank == 0:
+        result = {'status': 'passed', 'purpose': 'CUDA/NCCL communication check; NOT training or FID',
+                  'slurm_job_id': os.environ.get('SLURM_JOB_ID'),
+                  'updated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                  'world_size': args.world_size, 'payload_bytes': payload.numel()*payload.element_size(),
+                  'expected_sum': expected, 'torch': torch.__version__,
+                  'nccl': torch.cuda.nccl.version(), 'peers': peers}
+        atomic_json(Path(args.output_dir) / 'network_probe.json', result)
+        print('NCCL preflight passed: ' + json.dumps(result), flush=True)
+    dist.barrier(device_ids=[args.gpu])
 
 
 def rng_state():
@@ -345,6 +384,7 @@ def main():
                 'steps_per_epoch': steps_per_epoch, 'grad_accumulation': args.grad_accumulation,
                 'checkpoint_interval': checkpoint_interval,
                 'slurm_nodes': os.environ.get('SLURM_JOB_NODELIST'),
+                'network_environment': network_environment(),
                 'dataset_images': len(dataset), 'images_per_epoch': len(loader)*args.batch_size*world,
                 'gpu': torch.cuda.get_device_name(), 'torch': torch.__version__,
                 'upstream_commit': subprocess.check_output(['git','-C',str(ROOT/'vendor/JiT'),'rev-parse','HEAD'],text=True).strip(),
