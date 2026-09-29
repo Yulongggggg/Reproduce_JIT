@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-29T18:31:45.711044+00:00",
+  "updated_utc": "2026-09-29T21:23:19.619560+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -20,6 +20,69 @@
     }
   },
   "gpu_count": 4,
+  "gpu_count_per_job": 4,
+  "models_may_run_concurrently": true,
+  "network_issue": {
+    "recorded_utc": "2026-09-29T21:21:19.005027+00:00",
+    "status_at_recording": "tcp_mitigation_deployed_gpu_validation_pending",
+    "failed_jobs": [
+      {
+        "model": "B/16",
+        "job_id": 107750,
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "start_local": "2026-09-29T14:37:19-04:00",
+        "end_local": "2026-09-29T14:37:41-04:00",
+        "gpu_count": 4,
+        "gpu_type": "NVIDIA H200",
+        "nodes": [
+          "alphagpu20",
+          "alphagpu23"
+        ],
+        "log": "logs/flexible-107750.log",
+        "successor_job_id": 109179
+      },
+      {
+        "model": "L/16",
+        "job_id": 107752,
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "start_local": "2026-09-29T14:37:53-04:00",
+        "end_local": "2026-09-29T14:38:07-04:00",
+        "gpu_count": 4,
+        "gpu_type": "NVIDIA H200",
+        "nodes": [
+          "alphagpu20",
+          "alphagpu23"
+        ],
+        "log": "logs/flexible-107752.log",
+        "successor_job_id": 109184
+      }
+    ],
+    "failed_stage": "scripts/run.py init_distributed initial NCCL barrier, before model loading or training",
+    "nccl_version": "2.21.5",
+    "error": "Call to ibv_modify_qp failed with error Invalid argument errno 22",
+    "mitigation": {
+      "scope": "split (two nodes with two GPUs each) only",
+      "environment": {
+        "NCCL_IB_DISABLE": "1",
+        "NCCL_NET": "Socket",
+        "NCCL_DEBUG": "INFO",
+        "JIT_NCCL_PREFLIGHT": "1"
+      },
+      "entrypoint": "scripts/torchrun_node.sh",
+      "documentation": "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2215/user-guide/docs/env.html#nccl-ib-disable",
+      "training_hyperparameters_changed": false,
+      "new_jobs_submitted_for_fix": false
+    },
+    "validation": "Queued allocations run a real 1 MiB CUDA all-reduce on four ranks and two hosts; each run/network_probe.json records success. CPU launcher checks are not GPU validation.",
+    "performance": "TCP throughput is unmeasured. Previous single-node H200 epoch timings cannot establish split-node completion time.",
+    "gpu_policy": "Four GPUs per training job; B/16 and L/16 may each use four GPUs concurrently. Same-model checkpoint lock remains mandatory."
+  },
+  "network_probes": {
+    "b16": null,
+    "l16": null
+  },
   "completed_models": [],
   "data_ready": true,
   "smoke": true,
@@ -54,24 +117,24 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101984,
-    "pipeline_note": "2026-09-29 14:31 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709\u56db\u5361\u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u7eed\u8dd1\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-09-29 17:22 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709\u56db\u5361\u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u7eed\u8dd1\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 101983,
-    "queue_checked_utc": "2026-09-29T18:31:44.627441+00:00",
+    "queue_checked_utc": "2026-09-29T21:22:42.919632+00:00",
     "queue_snapshot": {
-      "107752": {
-        "state": "PENDING",
-        "node_or_reason": "(Priority)"
-      },
-      "107750": {
-        "state": "PENDING",
-        "node_or_reason": "(Priority)"
-      },
       "107751": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
       },
       "101984": {
+        "state": "PENDING",
+        "node_or_reason": "(Priority)"
+      },
+      "109179": {
+        "state": "PENDING",
+        "node_or_reason": "(Priority)"
+      },
+      "109184": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
       },
@@ -120,7 +183,9 @@
     "additional_job_ids": [
       107750,
       107751,
-      107752
+      107752,
+      109179,
+      109184
     ]
   }
 }

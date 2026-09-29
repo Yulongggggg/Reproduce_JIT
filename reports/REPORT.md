@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-29T18:31:45.711044+00:00
+更新时间：2026-09-29T21:23:19.619560+00:00
 
 ## 当前进度
 
@@ -8,21 +8,27 @@
 
 **当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。
 
+**跨节点启动故障：B/16 作业 107750（FAILED）；L/16 作业 107752（FAILED）。** 两个任务在美东 2026-09-29 14:37 先后获分配，各用 4 张 H200（2 节点各 2 卡），均在初始 NCCL barrier 报 `ibv_modify_qp: Invalid argument errno 22`，尚未进入训练，未推进检查点。已仅为双节点入口配置 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket`，下一次分配后先做真实四卡 all-reduce 检查。故障证据与配置范围见 [记录](multinode_network_issue.json)。
+
+JiT-B/16 TCP 替代方案尚无真实 GPU 验证结果，不能宣称故障已解决。
+
+JiT-L/16 TCP 替代方案尚无真实 GPU 验证结果，不能宣称故障已解决。
+
 自动汇报：每 6 小时在本对话和 GitHub 更新（美东 02:30, 08:30, 14:30, 20:30），状态 `active`；下一次计划时间：2026-09-29T20:30:00-04:00。定时器所在登录主机需保持运行。
 
 - JiT-B/16：训练历史日志最高完成 184/200 epochs；可恢复检查点为第 184 轮。
 
 - JiT-L/16：训练历史日志最高完成 0/200 epochs；可恢复检查点为第 0 轮。
 
-JiT-B/16 最近 5 个 epoch 平均 5.8 分钟；剩余训练约 1.5 小时，不含评估、重试和排队。
+JiT-B/16 最近 5 个已完成 epoch 平均 5.8 分钟；仅在相同吞吐下，剩余训练约 1.5 小时，不含评估、重试和排队。双节点 TCP 的实际训练速度尚需实测，不能直接沿用单节点耗时。
 
 JiT-B/16 第 160 epoch 中途评估：FID-8000=8.9342，CFG=2.9，EMA=0.9996。这是中途 8K 指标，不能作为最终 FID-50K 结果。
 
-按用户最新要求，全部训练任务均为总计四卡。遗留八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。
+按用户明确的要求，每个训练任务总计四卡；B/16、L/16 可各用四卡并行。遗留单任务八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。
 
 资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点。B/16 独立候选允许 2–12 小时，L/16 允许 3–12 小时；原串行续跑链默认 3–12 小时，当前 B/16 入口也已放宽至最短 2 小时。失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。
 
-资源检查快照（2026-09-29T18:31:45.334160+00:00）：28 台 GPU 节点共 224 卡，其中 224 卡已被 Slurm 分配。这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。双节点任务已通过 Slurm 配置检查，CUDA/NCCL 实际运行仍待分配资源验证。
+资源检查快照（2026-09-29T18:31:45.334160+00:00）：28 台 GPU 节点共 224 卡，其中 224 卡已被 Slurm 分配。这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。
 
 GPU smoke：passed，NVIDIA H100 80GB HBM3。
 
@@ -31,10 +37,10 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-107752 jit_l16_split PENDING (Priority)
-107750 jit_b16_split PENDING (Priority)
 107751 jit_l16_single PENDING (Priority)
 101984 jit_b16_l16_4gpu PENDING (Priority)
+109179 jit_b16_split PENDING (Priority)
+109184 jit_l16_split PENDING (Priority)
 101994 jit_b16_l16_4gpu PENDING (Dependency)
 101993 jit_b16_l16_4gpu PENDING (Dependency)
 101992 jit_b16_l16_4gpu PENDING (Dependency)
@@ -47,7 +53,7 @@ Slurm 队列：
 101985 jit_b16_l16_4gpu PENDING (Dependency)
 ```
 
-流水线记录：2026-09-29 14:31 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
+流水线记录：2026-09-29 17:22 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
 
 ## 预注册设置
 

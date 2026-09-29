@@ -1,0 +1,57 @@
+{
+  "recorded_utc": "2026-09-29T21:21:19.005027+00:00",
+  "status_at_recording": "tcp_mitigation_deployed_gpu_validation_pending",
+  "failed_jobs": [
+    {
+      "model": "B/16",
+      "job_id": 107750,
+      "state": "FAILED",
+      "exit_code": "1:0",
+      "start_local": "2026-09-29T14:37:19-04:00",
+      "end_local": "2026-09-29T14:37:41-04:00",
+      "gpu_count": 4,
+      "gpu_type": "NVIDIA H200",
+      "nodes": [
+        "alphagpu20",
+        "alphagpu23"
+      ],
+      "log": "logs/flexible-107750.log",
+      "successor_job_id": 109179
+    },
+    {
+      "model": "L/16",
+      "job_id": 107752,
+      "state": "FAILED",
+      "exit_code": "1:0",
+      "start_local": "2026-09-29T14:37:53-04:00",
+      "end_local": "2026-09-29T14:38:07-04:00",
+      "gpu_count": 4,
+      "gpu_type": "NVIDIA H200",
+      "nodes": [
+        "alphagpu20",
+        "alphagpu23"
+      ],
+      "log": "logs/flexible-107752.log",
+      "successor_job_id": 109184
+    }
+  ],
+  "failed_stage": "scripts/run.py init_distributed initial NCCL barrier, before model loading or training",
+  "nccl_version": "2.21.5",
+  "error": "Call to ibv_modify_qp failed with error Invalid argument errno 22",
+  "mitigation": {
+    "scope": "split (two nodes with two GPUs each) only",
+    "environment": {
+      "NCCL_IB_DISABLE": "1",
+      "NCCL_NET": "Socket",
+      "NCCL_DEBUG": "INFO",
+      "JIT_NCCL_PREFLIGHT": "1"
+    },
+    "entrypoint": "scripts/torchrun_node.sh",
+    "documentation": "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2215/user-guide/docs/env.html#nccl-ib-disable",
+    "training_hyperparameters_changed": false,
+    "new_jobs_submitted_for_fix": false
+  },
+  "validation": "Queued allocations run a real 1 MiB CUDA all-reduce on four ranks and two hosts; each run/network_probe.json records success. CPU launcher checks are not GPU validation.",
+  "performance": "TCP throughput is unmeasured. Previous single-node H200 epoch timings cannot establish split-node completion time.",
+  "gpu_policy": "Four GPUs per training job; B/16 and L/16 may each use four GPUs concurrently. Same-model checkpoint lock remains mandatory."
+}
