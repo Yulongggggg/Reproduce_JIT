@@ -5,8 +5,8 @@
   "calendar": "02:30, 08:30, 14:30, 20:30",
   "host": "alpha1",
   "systemd_timer": "jit-report-6h.timer",
-  "last_attempt_utc": "2026-09-28T18:30:10.951397+00:00",
-  "next_report_local": "2026-09-28T20:30:00-04:00",
+  "last_attempt_utc": "2026-09-29T00:30:36.159654+00:00",
+  "next_report_local": "2026-09-29T02:30:00-04:00",
   "destinations": [
     "existing Codex conversation",
     "GitHub reports/REPORT.md"
@@ -14,11 +14,5 @@
   "comparison_epoch": 200,
   "comparison_images": 50000,
   "official_100_epoch_reference": null,
-  "requires": "login host and user systemd service running; Codex daemon reachable",
-  "scheduler_query_verified_utc": "2026-09-28T18:51:01.800668+00:00",
-  "scheduler_path_fix": {
-    "previous_error": "[Errno 2] No such file or directory: 'squeue'",
-    "slurm_bin": "/cm/shared/apps/slurm/current/bin",
-    "validation": "User systemd service with corrected PATH successfully refreshed squeue and sacct; existing timer remains active."
-  }
+  "requires": "login host and user systemd service running; Codex daemon reachable"
 }
