@@ -1,0 +1,41 @@
+{
+  "checked_utc": "2026-09-29T14:41:32.762826+00:00",
+  "purpose": "Allow shorter backfill for B16, which has 184 of 200 epochs durably saved.",
+  "previous_time_min": "03:00:00",
+  "new_time_min": "02:00:00",
+  "scope": "Existing B16 entry and B16 flexible candidates; L16 remains at three-hour minimum.",
+  "preserved": "Four total GPUs, global batch 1024, CFG settings, checkpoint and existing queue eligibility.",
+  "job_settings": [
+    {
+      "JobId": "101984",
+      "JobState": "PENDING",
+      "QOS": "priority",
+      "TimeLimit": "12:00:00",
+      "TimeMin": "02:00:00",
+      "SubmitTime": "2026-09-26T00:01:46",
+      "EligibleTime": "2026-09-29T03:07:40",
+      "AccrueTime": "2026-09-29T03:07:40",
+      "StartTime": "2026-09-30T03:00:00",
+      "ReqTRES": "cpu=40,mem=256G,node=1,billing=88,gres/gpu=4"
+    },
+    {
+      "JobId": "107750",
+      "JobState": "PENDING",
+      "QOS": "priority",
+      "TimeLimit": "12:00:00",
+      "TimeMin": "02:00:00",
+      "SubmitTime": "2026-09-28T22:24:57",
+      "EligibleTime": "2026-09-28T22:24:57",
+      "AccrueTime": "2026-09-28T22:24:57",
+      "StartTime": "2026-09-29T11:31:54",
+      "ReqTRES": "cpu=40,mem=256G,node=2,billing=88,gres/gpu=4"
+    }
+  ],
+  "candidate_queue": [
+    "107750|jit_b16_split|PENDING|2|gres:gpu:2|(Priority)|2026-09-29T11:31:54",
+    "107752|jit_l16_split|PENDING|2|gres:gpu:2|(Priority)|2026-09-29T11:37:07",
+    "107751|jit_l16_single|PENDING|1|gres:gpu:4|(Priority)|2026-09-30T00:01:08",
+    "101984|jit_b16_l16_4gpu|PENDING|1|gres:gpu:4|(Priority)|2026-09-30T03:00:00"
+  ],
+  "eta_note": "Slurm start estimates change; they are not confirmed GPU allocations."
+}
