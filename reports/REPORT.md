@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-29T14:41:33.151601+00:00
+更新时间：2026-09-29T14:59:57.902359+00:00
 
 ## 当前进度
 
@@ -31,8 +31,8 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-107750 jit_b16_split PENDING (Priority)
 107752 jit_l16_split PENDING (Priority)
+107750 jit_b16_split PENDING (Priority)
 107751 jit_l16_single PENDING (Priority)
 101984 jit_b16_l16_4gpu PENDING (Priority)
 101994 jit_b16_l16_4gpu PENDING (Dependency)
@@ -47,7 +47,7 @@ Slurm 队列：
 101985 jit_b16_l16_4gpu PENDING (Dependency)
 ```
 
-流水线记录：2026-09-29 10:41 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
+流水线记录：2026-09-29 10:59 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
 
 ## 预注册设置
 
