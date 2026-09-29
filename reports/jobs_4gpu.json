@@ -27,16 +27,12 @@
     101994
   ],
   "last_failed_job_id": 101979,
-  "next_train_job_id": 101983,
-  "pipeline_note": "2026-09-28 22:47 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101983 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。",
-  "active_train_job_id": null,
+  "next_train_job_id": 101984,
+  "pipeline_note": "2026-09-29 00:20 EDT 自动检查：正在运行：101983 (alphagpu20)。 训练历史最大轮数和可恢复检查点分别列出。",
+  "active_train_job_id": 101983,
   "last_timed_out_job_id": 101982,
-  "queue_checked_utc": "2026-09-29T02:47:27.753213+00:00",
+  "queue_checked_utc": "2026-09-29T04:20:37.900248+00:00",
   "queue_snapshot": {
-    "101983": {
-      "state": "PENDING",
-      "node_or_reason": "(Priority)"
-    },
     "107752": {
       "state": "PENDING",
       "node_or_reason": "(Priority)"
@@ -92,9 +88,15 @@
     "101984": {
       "state": "PENDING",
       "node_or_reason": "(Dependency)"
+    },
+    "101983": {
+      "state": "RUNNING",
+      "node_or_reason": "alphagpu20"
     }
   },
-  "active_train_job_ids": [],
+  "active_train_job_ids": [
+    101983
+  ],
   "additional_job_ids": [
     107750,
     107751,
