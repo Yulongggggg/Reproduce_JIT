@@ -1,0 +1,102 @@
+"""Check concurrency and continuation safety without allocating any GPUs."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+import resource_queue as queue
+
+
+class ResourceQueueTests(unittest.TestCase):
+    def test_model_lock_excludes_other_process_and_releases(self):
+        with tempfile.TemporaryDirectory() as directory:
+            handle = queue.try_model_lock(directory)
+            command = [sys.executable, '-c',
+                       'import sys; from resource_queue import try_model_lock; '
+                       'h=try_model_lock(sys.argv[1]); sys.exit(0 if h else 75)', directory]
+            self.assertEqual(subprocess.run(command, cwd=Path(__file__).parent).returncode, 75)
+            handle.close()
+            self.assertEqual(subprocess.run(command, cwd=Path(__file__).parent).returncode, 0)
+
+    def test_both_shapes_keep_four_gpus_and_forty_cpu_cores(self):
+        for profile, (nodes, gpus, cpus, _) in queue.PROFILES.items():
+            self.assertEqual(nodes*gpus, 4)
+            self.assertEqual(nodes*cpus, 40)
+            command = queue.sbatch_command('l16', profile, 1234)
+            self.assertIn('--dependency=afternotok:1234', command)
+            self.assertIn('--time-min=03:00:00', command)
+            self.assertEqual(command[-2:], ['l16', profile])
+
+    def test_duplicate_submission_reuses_existing_job(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            record = root/'jobs.json'
+            record.write_text(json.dumps({'jobs': [
+                {'model': 'l16', 'profile': 'single', 'job_id': 42}]}))
+            with patch.object(queue, 'ROOT', root), patch.object(queue, 'RECORD', record), \
+                 patch.object(queue.subprocess, 'check_output', return_value='42|PENDING\n') as call:
+                self.assertEqual(queue.submit('l16', 'single'), 42)
+                self.assertEqual(call.call_count, 1)
+                self.assertEqual(call.call_args.args[0][0], 'squeue')
+
+    def prepare(self, directory):
+        root = Path(directory)
+        (root/'configs').mkdir()
+        (root/'configs/l16_4gpu_200ep.json').write_text(json.dumps({'output_dir': 'runs/l16'}))
+        return root, root/'runs/l16'
+
+    def test_busy_candidate_releases_without_training_or_successor(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, output = self.prepare(directory)
+            with queue.try_model_lock(output), patch.object(queue, 'ROOT', root), \
+                 patch.object(queue, 'submit') as submit, \
+                 patch.object(queue.subprocess, 'run') as run:
+                self.assertEqual(queue.worker('l16', 'single'), 0)
+                submit.assert_not_called()
+                run.assert_not_called()
+
+    def test_timeout_continues_but_three_crashes_stop(self):
+        jobs = {'jobs': [{'job_id': i, 'predecessor': i-1} for i in range(2, 5)]}
+        with patch.object(queue, 'read', return_value=jobs):
+            with patch.object(queue.subprocess, 'check_output', return_value='1|FAILED|\n2|FAILED|\n3|OUT_OF_MEMORY|\n'):
+                self.assertTrue(queue.repeated_failures(4))
+            with patch.object(queue.subprocess, 'check_output', return_value='1|FAILED|\n2|TIMEOUT|\n3|FAILED|\n'):
+                self.assertFalse(queue.repeated_failures(4))
+
+    def test_successor_precedes_training_and_only_it_is_cancelled_on_completion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, output = self.prepare(directory)
+            calls = []
+
+            def submit(model, profile, dependency):
+                self.assertEqual(dependency, 1234)
+                calls.append('submit')
+                return 5678
+
+            def run(command, **kwargs):
+                self.assertIsNone(queue.try_model_lock(output))
+                if command[0] == 'torchrun':
+                    self.assertEqual(calls, ['submit'])
+                    self.assertEqual(kwargs['env']['JIT_ALLOCATION_LOCK_HELD'], '1')
+                    (output/'summary.json').write_text('{"status":"complete"}')
+                    calls.append('train')
+                else:
+                    self.assertEqual(command, ['scancel', '5678'])
+                    calls.append('cancel')
+                return subprocess.CompletedProcess(command, 0)
+
+            with patch.object(queue, 'ROOT', root), patch.object(queue, 'submit', side_effect=submit), \
+                 patch.dict(os.environ, {'SLURM_JOB_ID': '1234'}), \
+                 patch.object(queue.subprocess, 'run', side_effect=run):
+                self.assertEqual(queue.worker('l16', 'single'), 0)
+            self.assertEqual(calls, ['submit', 'train', 'cancel'])
+            with queue.try_model_lock(output):
+                pass
+
+
+if __name__ == '__main__':
+    unittest.main()

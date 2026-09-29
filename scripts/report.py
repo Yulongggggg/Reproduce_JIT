@@ -4,6 +4,7 @@ import datetime
 import json
 from pathlib import Path
 import subprocess
+from resource_queue import queue_ids
 from evaluation_protocol import (comparison, validate_metric, PAPER_URL, PAPER_PROTOCOL,
                                  EMA_CANDIDATES, CFG_CANDIDATES)
 
@@ -42,7 +43,7 @@ def main():
     smoke = smokes.get('b16') or read(REPORTS/'smoke.json')
     stamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
     try:
-        ids = ','.join(str(v) for v in jobs.get('job_ids', []))
+        ids = ','.join(map(str, queue_ids(jobs, REPORTS/'jobs_flexible.json')))
         queue = subprocess.check_output(['squeue','-h','-j',ids,'-o','%i %j %T %R'],text=True,timeout=20).strip() if ids else '尚未提交'
     except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         queue = '当前无法查询调度器；请查阅 jobs_4gpu.json'
@@ -67,19 +68,25 @@ def main():
         with (REPORTS/'training.csv').open('w') as f:
             writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n'); writer.writeheader(); writer.writerows(rows)
     text = [f'# JiT 官方配置复现实验报告\n\n更新时间：{stamp}',
-            f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；检查点每 5 轮保存，异常退出后从检查点恢复：']
+            f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；此前每 5 轮保存，新增资源候选后四卡训练每轮保存，异常退出后从检查点恢复：']
     waiting = ' PENDING ' in queue and ' RUNNING ' not in queue and len(complete) < len(MODELS)
     if waiting:
         text.append('**当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。')
     schedule = read(REPORTS/'report_schedule.json')
     if schedule:
         text.append(f'自动汇报：每 6 小时在本对话和 GitHub 更新（美东 {schedule["calendar"]}），状态 `{schedule["status"]}`；下一次计划时间：{schedule.get("next_report_local") or "任务已完成"}。定时器所在登录主机需保持运行。')
-    text.extend([f'- JiT-{m[0].upper()}/{m[1:]}：训练日志已完成 {progress[m]["completed_epochs"]}/200 epochs；可恢复检查点为第 {progress[m]["checkpoint_completed_epochs"]} 轮。' for m in MODELS])
+    text.extend([f'- JiT-{m[0].upper()}/{m[1:]}：训练历史日志最高完成 {progress[m]["completed_epochs"]}/200 epochs；可恢复检查点为第 {progress[m]["checkpoint_completed_epochs"]} 轮。' for m in MODELS])
+    running_ids = {line.split()[0] for line in queue.splitlines() if ' RUNNING ' in line}
     for m in MODELS:
+        queue_error = read(runs[m]/'queue_error.json')
+        if queue_error:
+            text.append(f'JiT-{m[0].upper()}/{m[1:]} 调度异常记录：{queue_error}')
         recent = [r for r in rows if r['model'] == m][-5:]
         if recent:
             seconds = sum(r['seconds'] for r in recent) / len(recent)
-            restart_epoch = progress[m]['checkpoint_completed_epochs'] if waiting else progress[m]['completed_epochs']
+            metadata = read(runs[m]/'run_metadata.json', {})
+            model_running = str(metadata.get('slurm_job_id')) in running_ids
+            restart_epoch = progress[m]['completed_epochs'] if model_running else progress[m]['checkpoint_completed_epochs']
             left = max(0, 200 - restart_epoch) * seconds / 3600
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 最近 {len(recent)} 个 epoch 平均 {seconds/60:.1f} 分钟；剩余训练约 {left:.1f} 小时，不含评估、重试和排队。')
         monitors = [read(p) for p in (runs[m]/'evaluations').glob('monitor-*.json')]
@@ -89,7 +96,21 @@ def main():
         selection = read(runs[m]/'evaluation_selection.json')
         if selection:
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 第 {selection["completed_epochs"]} epoch 的 EMA/CFG 搜索已完成 {selection["completed_candidates"]}/{selection["total_candidates"]} 组。')
-    text.append('8 卡实验仍使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。')
+    retired = read(REPORTS/'jobs_8gpu_retired.json')
+    if retired:
+        text.append('按用户最新要求，全部训练任务均为总计四卡。遗留八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。')
+    else:
+        text.append('8 卡实验使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。')
+    if read(REPORTS/'jobs_flexible.json'):
+        text.append('资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点，候选申请 3–12 小时以利用短空档；失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。')
+    resource_snapshot = read(REPORTS/'resource_snapshot.json')
+    if resource_snapshot:
+        text.append(f'资源检查快照（{resource_snapshot["checked_utc"]}）：'
+                    f'{resource_snapshot["gpu_nodes"]} 台 GPU 节点共 {resource_snapshot["total_gpus"]} 卡，'
+                    f'其中 {resource_snapshot["allocated_gpus"]} 卡已被 Slurm 分配。'
+                    '这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。'
+                    '详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。'
+                    '双节点任务已通过 Slurm 配置检查，CUDA/NCCL 实际运行仍待分配资源验证。')
     text.append('GPU smoke：'+(f'{smoke["status"]}，{smoke.get("gpu")}' if smoke else '未完成')+'。')
     if not data:
         parts=list((ROOT/'data/imagenet/.download_parts').glob('[0-9]*'))
@@ -100,7 +121,7 @@ def main():
     if jobs.get('pipeline_note'):
         text.append('流水线记录：'+jobs['pipeline_note'])
     text += ['## 预注册设置',
-             '当前按用户要求先训练 JiT-B/16、JiT-L/16；每个模型从头训练 200 epochs，AdamW、实际 LR=2e-4、全局有效 batch=1024、5 epoch warmup、constant LR。4 张卡时 B/16 每卡 batch 128、累积 2 次；L/16 每卡 batch 64、累积 4 次。',
+             '当前按用户要求优先训练 JiT-B/16、JiT-L/16，各 200 epochs；B/16 从已有检查点续跑，L/16 独立排队。AdamW、实际 LR=2e-4、全局有效 batch=1024、5 epoch warmup、constant LR。4 张卡时 B/16 每卡 batch 128、累积 2 次；L/16 每卡 batch 64、累积 4 次。',
              '固定 CFG 和分辨率：B/16 256² CFG 2.9（官方；另测 issue #56 的 CFG 3.6、EMA 0.9996）；L/16 256² CFG 2.4。CFG interval 均为 [0.1,1.0]，ODE solver 为 50-step Heun。',
              '固定 CFG 结果沿用作者 README：在该 CFG 下用 8K 选择 EMA，再生成 50K。另按论文 Appendix A 搜索 CFG=1.0–4.0（步长 0.1）与 EMA={0.9996,0.9998,0.9999} 共 93 组，每组 8K；选出最低 FID 对应参数后生成 50K 并计算 FID。固定 CFG 的结果和论文搜索结果分别列出。',
              '训练超参、批量和累积步数见 [`configs/`](../configs/)。B/L 的 dropout 为 0，P_mean=-0.8、P_std=0.8、t_eps=0.05、label drop=0.1、noise scale=1。4 卡等效设置和数值复现的边界见 [说明](four_gpu_equivalence.md)。',
@@ -219,7 +240,7 @@ def main():
             pass
     text += ['\n## 复现证据与边界',
              '上游 JiT 与定制 torch-fidelity 使用锁定 submodule；原模型、denoiser、loss 和 attention 保持上游实现。环境锁、GPU smoke 和数据验证记录见本目录。',
-             '训练保存 checkpoint、三组 EMA、优化器和各 rank RNG，每 5 epochs 保存一次；本轮执行顺序为 B/16、L/16。',
+             '训练保存 checkpoint、三组 EMA、优化器和各 rank RNG。此前每 5 epochs 保存，增加短时段候选后四卡训练每 epoch 保存；B/16、L/16 可独立并行。',
              '200 epoch 是目标训练预算；FID 使用 1000 类均衡的 50K 样本。8K 用于训练监测和 EMA/CFG 选择，不代替正式结果。',
              '2026-09-27 加入完整论文评估流程；训练脚本在作业启动时加载，排队中的自动续跑任务会读取更新后的版本，在 200 epoch 触发最终评估。',
              '每个 50K 阶段完成后自动生成此报告并尝试提交、推送到 GitHub。单组评估结果可断点复用；推送失败记录在运行目录的 `report_publish.json`，不会中断训练。']

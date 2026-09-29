@@ -21,7 +21,7 @@ H/16, 256², CFG 2.2
 H/32, 512², CFG 2.3
 ```
 
-当前运行 4 卡 B/16 → L/16 队列，原 8 卡队列保留为独立实验，输出目录分开。B/16 每卡 batch=128、累积 2 次，L/16 每卡 batch=64、累积 4 次，均为有效 batch=1024。其他四个模型仅保留配置，暂不进入当前队列。
+当前所有训练任务均使用总计四卡复现 B/16、L/16，独立候选让两模型可并行。按用户最新要求，原 8 卡待运行队列已取消，不再提交。B/16 每卡 batch=128、累积 2 次，L/16 每卡 batch=64、累积 4 次，均为有效 batch=1024。其他四个模型仅保留配置，暂不进入当前队列。
 
 ## 自动 FID-50K
 
@@ -51,15 +51,32 @@ bash scripts/install.sh
 mkdir -p logs
 data_job=$(sbatch --parsable scripts/data.sbatch)
 smoke_job=$(sbatch --parsable scripts/smoke.sbatch)
-sbatch --dependency=afterok:${data_job}:${smoke_job} scripts/train.sbatch
+sbatch --dependency=afterok:${data_job}:${smoke_job} scripts/train4.sbatch
 ```
 
-Slurm job script 对应当前集群账号。当前四卡脚本为 `scripts/train4.sbatch`，申请 4 张 H100/H200、40 CPU、256 GiB RAM，每次最多 12 小时，已提交自动续跑链（见 `reports/jobs_4gpu.json`，不要重复提交）。数据已通过完整 MD5，并解压为 1000 类、1,281,167 张训练图片。
+Slurm job script 对应当前集群账号。原四卡脚本为 `scripts/train4.sbatch`，申请 4 张 H100/H200、40 CPU、256 GiB RAM，每次最多 12 小时，已有自动续跑链（见 `reports/jobs_4gpu.json`）。数据已通过完整 MD5，并解压为 1000 类、1,281,167 张训练图片。
 
-超时或节点故障后，从检查点恢复整个有序队列：
+### 可并行的资源候选
+
+用户授权增加候选后，`scripts/resource_queue.py` 支持 `single`（一节点四卡）和 `split`（两节点各两卡）两种申请。两者总计均为四卡、40 CPU、256 GiB RAM，保持原配置、四个全局 rank 和有效 batch=1024；跨节点会改变通信性能，不声称数值逐位一致。申请 `priority` QoS、3–12 小时时段，允许 Slurm backfill 提前安排较短空档。
+
+每模型的 `.allocation.lock` 覆盖原入口与新入口：同时分配到资源的候选中，仅一个能训练/评估并写该模型检查点，另一个立即释放；B/16 和 L/16 使用不同锁，可以并行。新入口先提交唯一的 `afternotok` 后继，再运行训练；超时/失败后自动续跑，模型全部评估完成则取消自己的待运行后继。连续三次程序失败或 OOM 会停止该候选自动重试并在报告中标出，以免错误循环消耗 GPU；正常 TIMEOUT 不受此限制。四卡训练改为每个 epoch 保存，以减少短时段退出时丢失的进度；模型和训练超参不变。额外任务登记在 `reports/jobs_flexible.json`，六小时汇报和 GitHub 报告同时追踪它们。
+
+`--time-min` 的较短时段由 Slurm backfill 决定，[官方说明](https://slurm.schedmd.com/sbatch.html#OPT_time-min)。跨节点配置检查已通过，实际 CUDA/NCCL 运行验证需等 GPU 分配；最近资源分配快照见 [resource_snapshot.json](reports/resource_snapshot.json)。
 
 ```bash
-sbatch scripts/train.sbatch
+.env/bin/python scripts/resource_queue.py submit b16 split
+.env/bin/python scripts/resource_queue.py submit l16 single
+.env/bin/python scripts/resource_queue.py submit l16 split
+```
+
+提交器会复用仍在排队或运行的同模型/同形状候选，不因重复调用创建新任务。
+
+新候选在超时或节点故障后自动从检查点恢复。检查状态，或在对应候选不再运行/排队时通过幂等入口恢复：
+
+```bash
+.env/bin/python scripts/resource_queue.py submit b16 single
+.env/bin/python scripts/resource_queue.py submit l16 single
 squeue -u "$USER"
 .env/bin/python scripts/report.py
 bash scripts/publish.sh

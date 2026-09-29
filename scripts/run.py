@@ -15,6 +15,7 @@ import subprocess
 import sys
 import time
 from evaluation_protocol import protocol_for, run_final_evaluations, validate_metric
+from resource_queue import try_model_lock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'vendor/JiT'))
@@ -224,8 +225,23 @@ def main():
     args.output_dir = str(ROOT / args.output_dir)
     init_distributed(args)
     rank, world = misc.get_rank(), misc.get_world_size()
+    allocation_lock = None
+    if cli.mode != 'smoke':
+        acquired = True
+        if rank == 0 and os.environ.get('JIT_ALLOCATION_LOCK_HELD') != '1':
+            allocation_lock = try_model_lock(args.output_dir)
+            acquired = allocation_lock is not None
+        ownership = [acquired]
+        dist.broadcast_object_list(ownership, src=0)
+        if not ownership[0]:
+            if rank == 0:
+                print(f'Another allocation owns {args.output_dir}; skipping this model.', flush=True)
+            dist.destroy_process_group()
+            return
     if cli.mode != 'smoke':
         assert world in (4, 8) and args.batch_size * world * args.grad_accumulation == 1024
+    # Short backfill allocations must retain completed epochs. This only changes I/O.
+    checkpoint_interval = 1 if world == 4 else args.save_every
     torch.manual_seed(args.seed + rank)
     np.random.seed(args.seed + rank)
     random.seed(args.seed + rank)
@@ -327,6 +343,8 @@ def main():
             atomic_json(output / 'run_metadata.json', {
                 'config': vars(args), 'world_size': world, 'microsteps_per_epoch': len(loader),
                 'steps_per_epoch': steps_per_epoch, 'grad_accumulation': args.grad_accumulation,
+                'checkpoint_interval': checkpoint_interval,
+                'slurm_nodes': os.environ.get('SLURM_JOB_NODELIST'),
                 'dataset_images': len(dataset), 'images_per_epoch': len(loader)*args.batch_size*world,
                 'gpu': torch.cuda.get_device_name(), 'torch': torch.__version__,
                 'upstream_commit': subprocess.check_output(['git','-C',str(ROOT/'vendor/JiT'),'rev-parse','HEAD'],text=True).strip(),
@@ -377,7 +395,7 @@ def main():
                 append_json(output / 'train.jsonl', row)
                 writer.flush()
                 print(json.dumps(row), flush=True)
-            if (epoch+1) % args.save_every == 0 or epoch+1 == args.epochs:
+            if (epoch+1) % checkpoint_interval == 0 or epoch+1 == args.epochs:
                 save_checkpoint(model, optimizer, args, epoch, global_step, generator)
             if (epoch+1) % 40 == 0 and epoch+1 < args.epochs:
                 evaluate(model, args, 0.9996, args.cfg, 8000, 'monitor', epoch+1)

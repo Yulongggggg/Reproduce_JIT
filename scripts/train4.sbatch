@@ -10,6 +10,7 @@
 #SBATCH --constraint=h100|h200
 #SBATCH --mem=256G
 #SBATCH --time=12:00:00
+#SBATCH --time-min=03:00:00
 #SBATCH --output=logs/train4-%j.log
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR}"

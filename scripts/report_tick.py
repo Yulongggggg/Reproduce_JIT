@@ -14,6 +14,7 @@ import time
 from zoneinfo import ZoneInfo
 
 from evaluation_protocol import comparison
+from resource_queue import queue_ids
 
 ROOT = Path(__file__).resolve().parents[1]
 INTERVAL = 21600
@@ -24,6 +25,8 @@ PROMPT = '''【用户已授权的 JiT 每 6 小时定时汇报】
 读取真实 Slurm 状态、训练日志、检查点和评估文件，区分正在运行、排队和故障；说明 B/16 与 L/16 各自进度、GPU 数及剩余时间。超时后可能从较早检查点重跑，不能把历史日志最大轮数当成当前正在执行的轮数。
 仅用真实的、同模型/分辨率/epoch/评估协议的 FID-50K 与论文比较，给出绝对差值及百分比。官方 Table 6 的 200 epoch 基准：B/16=4.37，L/16=2.79。未找到可直接对照的官方 100 epoch 基准，不拿 100 epoch 对比 200 epoch。8K 仅是监测或选参数据，不可冒充 50K；没有正式结果时直说尚不能判断是否接近官方。
 保留 B/16 CFG=2.9、L/16 CFG=2.4 的固定 CFG 结果，并分别报告论文 EMA/CFG 搜索流程的结果。必要时排查真实故障，但不重复提交运行/排队中的训练，不随意修改训练超参。
+用户已授权主动寻找资源并增加候选。同时读取 reports/jobs_flexible.json，追踪单节点四卡/双节点各两卡候选；它们使用同模型互斥锁，可让 B/16、L/16 并行。发现某模型仍未完成却已无运行/待运行候选时，可通过 scripts/resource_queue.py 的幂等 submit 恢复候选，禁止绕过模型锁。固定 world_size=4、有效 batch=1024，不重复从头训练。
+用户最新限定所有训练任务总计四卡。遗留八卡队列已取消，不得重新提交或恢复八卡任务。
 本次是已安装定时器的正常触发，不要重新创建定时器，也不需要再次询问汇报授权。使用 bash scripts/publish.sh 更新 GitHub。B/16、L/16 的 200 epoch 训练和正式对照均完成后，给最终总结并确认此定时器已经停止。'''
 
 
@@ -64,15 +67,18 @@ def finished():
 def refresh_jobs():
     path = ROOT/'reports/jobs_4gpu.json'
     jobs = read(path)
-    ids = ','.join(map(str, jobs['job_ids']))
+    all_ids = queue_ids(jobs, ROOT/'reports/jobs_flexible.json')
+    ids = ','.join(map(str, all_ids))
     output = subprocess.check_output(['squeue', '-h', '-j', ids, '-o', '%i|%T|%R'],
                                      text=True, timeout=30)
     states = {}
     for line in output.splitlines():
         job, state, reason = line.split('|', 2)
         states[int(job)] = {'state': state, 'node_or_reason': reason}
-    running = [i for i in jobs['job_ids'] if states.get(i, {}).get('state') == 'RUNNING']
-    pending = [i for i in jobs['job_ids'] if states.get(i, {}).get('state') == 'PENDING']
+    running = [i for i in all_ids if states.get(i, {}).get('state') == 'RUNNING']
+    pending = [i for i in all_ids if states.get(i, {}).get('state') == 'PENDING']
+    jobs['active_train_job_ids'] = running
+    jobs['additional_job_ids'] = [i for i in all_ids if i not in jobs['job_ids']]
     jobs['active_train_job_id'] = running[0] if running else None
     jobs['next_train_job_id'] = pending[0] if pending else None
     jobs['queue_checked_utc'] = dt.datetime.now(dt.timezone.utc).isoformat()
@@ -86,7 +92,7 @@ def refresh_jobs():
         jobs['last_timed_out_job_id'] = max(timed_out)
     stamp = dt.datetime.now(TIMEZONE).strftime('%Y-%m-%d %H:%M %Z')
     if running:
-        status = f'作业 {running[0]} 正在 {states[running[0]]["node_or_reason"]} 运行。'
+        status = '正在运行：' + '；'.join(f'{i} ({states[i]["node_or_reason"]})' for i in running) + '。'
     elif pending:
         status = f'目前没有四卡训练作业运行；续跑作业 {pending[0]} 正在排队（{states[pending[0]]["node_or_reason"]}）。'
     else:
