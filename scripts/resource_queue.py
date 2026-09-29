@@ -44,7 +44,8 @@ def sbatch_command(model, profile, dependency=None):
                f'--nodes={nodes}', f'--ntasks={nodes}', '--ntasks-per-node=1',
                f'--cpus-per-task={cpus}', f'--gres=gpu:{gpus}',
                '--constraint=h100|h200', f'--mem={memory}', '--time=12:00:00',
-               '--time-min=03:00:00', '--output=logs/flexible-%j.log',
+               '--time-min=02:00:00' if model == 'b16' else '--time-min=03:00:00',
+               '--output=logs/flexible-%j.log',
                '--chdir=' + str(ROOT)]
     if dependency:
         command.append(f'--dependency=afternotok:{int(dependency)}')

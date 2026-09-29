@@ -102,7 +102,7 @@ def main():
     else:
         text.append('8 卡实验使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。')
     if read(REPORTS/'jobs_flexible.json'):
-        text.append('资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点，候选申请 3–12 小时以利用短空档；失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。')
+        text.append('资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点。B/16 独立候选允许 2–12 小时，L/16 允许 3–12 小时；原串行续跑链默认 3–12 小时，当前 B/16 入口也已放宽至最短 2 小时。失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。')
     resource_snapshot = read(REPORTS/'resource_snapshot.json')
     if resource_snapshot:
         text.append(f'资源检查快照（{resource_snapshot["checked_utc"]}）：'
