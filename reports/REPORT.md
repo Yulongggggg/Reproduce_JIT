@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-29T12:30:36.849946+00:00
+更新时间：2026-09-29T14:18:08.297860+00:00
 
 ## 当前进度
 
@@ -22,7 +22,7 @@ JiT-B/16 第 160 epoch 中途评估：FID-8000=8.9342，CFG=2.9，EMA=0.9996。�
 
 资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点，候选申请 3–12 小时以利用短空档；失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。
 
-资源检查快照（2026-09-29T02:28:15.172143+00:00）：28 台 GPU 节点共 224 卡，其中 223 卡已被 Slurm 分配。这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。双节点任务已通过 Slurm 配置检查，CUDA/NCCL 实际运行仍待分配资源验证。
+资源检查快照（2026-09-29T14:18:07.947043+00:00）：28 台 GPU 节点共 224 卡，其中 224 卡已被 Slurm 分配。这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。双节点任务已通过 Slurm 配置检查，CUDA/NCCL 实际运行仍待分配资源验证。
 
 GPU smoke：passed，NVIDIA H100 80GB HBM3。
 
@@ -31,8 +31,8 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-107750 jit_b16_split PENDING (Priority)
 107752 jit_l16_split PENDING (Priority)
+107750 jit_b16_split PENDING (Priority)
 107751 jit_l16_single PENDING (Priority)
 101984 jit_b16_l16_4gpu PENDING (Priority)
 101994 jit_b16_l16_4gpu PENDING (Dependency)
@@ -47,7 +47,7 @@ Slurm 队列：
 101985 jit_b16_l16_4gpu PENDING (Dependency)
 ```
 
-流水线记录：2026-09-29 08:30 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
+流水线记录：2026-09-29 10:18 EDT 自动检查：目前没有四卡训练作业运行；续跑作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
 
 ## 预注册设置
 
