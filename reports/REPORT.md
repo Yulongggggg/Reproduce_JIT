@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-30T18:10:59.337739+00:00
+更新时间：2026-09-30T18:16:17.620052+00:00
 
 ## 当前进度
 
@@ -61,8 +61,8 @@ Slurm 队列：
 101987 jit_b16_l16_4gpu PENDING (Dependency)
 101986 jit_b16_l16_4gpu PENDING (Dependency)
 101985 jit_b16_l16_4gpu PENDING (Dependency)
-110832 jit_b16_standard8 PENDING (Priority)
 110833 jit_l16_standard8 PENDING (Priority)
+110832 jit_b16_standard8 PENDING (Priority)
 ```
 
 流水线记录：2026-09-30 14:10 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
