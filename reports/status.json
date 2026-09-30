@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-30T18:30:32.901657+00:00",
+  "updated_utc": "2026-09-30T20:15:34.498082+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -33,7 +33,7 @@
     "l16": null
   },
   "experiment_plan": {
-    "updated_utc": "2026-09-30T18:11:42.272968+00:00",
+    "updated_utc": "2026-09-30T20:15:32.653525+00:00",
     "standard8_enabled": true,
     "preserve_existing_priority_four_gpu_candidates": true,
     "standard8": {
@@ -53,16 +53,16 @@
           "model": "b16",
           "job_id": 110832,
           "state_at_check": "PENDING",
-          "estimated_start_local": "2026-10-05T19:40:00-04:00"
+          "estimated_start_local": "2026-10-05T01:50:00-04:00"
         },
         {
           "model": "l16",
           "job_id": 110833,
           "state_at_check": "PENDING",
-          "estimated_start_local": "2026-10-05T19:55:00-04:00"
+          "estimated_start_local": "2026-10-05T05:05:00-04:00"
         }
       ],
-      "estimate_checked_local": "2026-09-30T14:03:30-04:00",
+      "estimate_checked_local": "2026-09-30T16:15:05-04:00",
       "estimate_note": "Actual submitted job estimates; not a reservation guarantee. They supersede the earlier test-only estimates."
     },
     "first_target_epochs": 200,
@@ -198,10 +198,10 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101984,
-    "pipeline_note": "2026-09-30 14:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-09-30 16:15 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 101983,
-    "queue_checked_utc": "2026-09-30T18:30:32.469475+00:00",
+    "queue_checked_utc": "2026-09-30T20:15:34.047511+00:00",
     "queue_snapshot": {
       "107751": {
         "state": "PENDING",

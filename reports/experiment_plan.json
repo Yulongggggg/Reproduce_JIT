@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-30T18:11:42.272968+00:00",
+  "updated_utc": "2026-09-30T20:15:32.653525+00:00",
   "standard8_enabled": true,
   "preserve_existing_priority_four_gpu_candidates": true,
   "standard8": {
@@ -19,16 +19,16 @@
         "model": "b16",
         "job_id": 110832,
         "state_at_check": "PENDING",
-        "estimated_start_local": "2026-10-05T19:40:00-04:00"
+        "estimated_start_local": "2026-10-05T01:50:00-04:00"
       },
       {
         "model": "l16",
         "job_id": 110833,
         "state_at_check": "PENDING",
-        "estimated_start_local": "2026-10-05T19:55:00-04:00"
+        "estimated_start_local": "2026-10-05T05:05:00-04:00"
       }
     ],
-    "estimate_checked_local": "2026-09-30T14:03:30-04:00",
+    "estimate_checked_local": "2026-09-30T16:15:05-04:00",
     "estimate_note": "Actual submitted job estimates; not a reservation guarantee. They supersede the earlier test-only estimates."
   },
   "first_target_epochs": 200,
