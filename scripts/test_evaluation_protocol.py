@@ -119,10 +119,14 @@ class EvaluationProtocolTests(unittest.TestCase):
             for name in ('b16', 'l16'):
                 config = json.loads((ROOT/f'configs/{name}_4gpu_200ep.json').read_text())
                 (root/f'configs/{name}_4gpu_200ep.json').write_text(json.dumps(config))
+                config8 = json.loads((ROOT/f'configs/{name}_8gpu_standard_200ep.json').read_text())
+                (root/f'configs/{name}_8gpu_standard_200ep.json').write_text(json.dumps(config8))
+            (root/'reports/experiment_plan.json').write_text('{"standard8_enabled":true}')
             run = root/'runs/b16_4gpu_200ep'
             (run/'evaluations').mkdir(parents=True)
             (run/'summary.json').write_text(json.dumps(self.saved[0]))
             (run/'progress.json').write_text(json.dumps({'completed_epochs': 200}))
+            (run/'run_metadata.json').write_text('{"world_size":8}')
             (run/'evaluations/monitor-ep080.json').write_text(json.dumps({
                 'completed_epochs': 80, 'num_images': 8000, 'cfg': 2.9,
                 'ema': 0.9996, 'frechet_inception_distance': 123.456}))
@@ -136,6 +140,7 @@ class EvaluationProtocolTests(unittest.TestCase):
             self.assertFalse(json.loads((root/'reports/status.json').read_text())['complete'])
             rows = json.loads((root/'reports/comparison_50k.json').read_text())
             self.assertEqual(rows[0]['status'], 'pending')
+            self.assertEqual(rows[0]['gpu_count'], 8)
             self.assertIsNone(rows[0]['delta'])
 
 

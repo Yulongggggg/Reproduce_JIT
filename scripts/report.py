@@ -32,10 +32,15 @@ def render_markdown(blocks):
 def main():
     REPORTS.mkdir(exist_ok=True)
     runs = {m: ROOT/f'runs/{m}_4gpu_200ep' for m in MODELS}
+    metadata = {m: read(p/'run_metadata.json', {}) for m,p in runs.items()}
+    worlds = {m: metadata[m].get('world_size', 4) for m in MODELS}
+    transitions = {m: read(p/'gpu_transition.json') for m,p in runs.items()}
+    plan = read(REPORTS/'experiment_plan.json', {})
     progress = {m: read(p/'progress.json', {'completed_epochs':0,'status':'not_started'})
                 for m,p in runs.items()}
     summaries = {m: read(p/'summary.json') for m,p in runs.items()}
-    configs = {m: read(ROOT/f'configs/{m}_4gpu_200ep.json') for m in MODELS}
+    configs = {m: read(ROOT/f'configs/{m}_8gpu_standard_200ep.json') if worlds[m] == 8
+                  else read(ROOT/f'configs/{m}_4gpu_200ep.json') for m in MODELS}
     comparisons = {m: comparison(summaries[m], configs[m]) for m in MODELS}
     jobs = read(REPORTS/'jobs_4gpu.json', {})
     data = read(ROOT/'data/imagenet/manifest.json')
@@ -68,10 +73,22 @@ def main():
         with (REPORTS/'training.csv').open('w') as f:
             writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n'); writer.writeheader(); writer.writerows(rows)
     text = [f'# JiT 官方配置复现实验报告\n\n更新时间：{stamp}',
-            f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 当前展示独立的 4 卡实验。训练轮数取自逐轮日志；此前每 5 轮保存，新增资源候选后四卡训练每轮保存，异常退出后从检查点恢复：']
+            f'## 当前进度\n\n**已完成训练与最终评估：{len(complete)}/{len(MODELS)}。** 目录沿用原四卡路径；实际训练卡数以运行元数据为准。训练轮数取自逐轮日志，每轮保存检查点，异常退出后从检查点恢复：']
     waiting = ' PENDING ' in queue and ' RUNNING ' not in queue and len(complete) < len(MODELS)
     if waiting:
-        text.append('**当前四卡任务在排队，没有正在运行的四卡训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。')
+        text.append('**当前候选任务在排队，没有正在运行的 JiT 训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。')
+    if plan.get('standard8_enabled'):
+        text.append('用户最新安排：保留已有四卡 priority 队列，增加 B/16、L/16 各一个单节点八卡 standard 备选，申请 24–48 小时。long 方案仅做过预检查，未提交。所有候选共享同模型文件锁；八卡实际接手后，旧四卡候选跳过该模型，不重复训练。')
+        text.append('八卡 B/16 每卡 batch=128、累积 1 次；L/16 每卡 batch=64、累积 2 次，均保持有效 batch=1024。四卡转八卡保留模型、优化器、三组 EMA、epoch 和 global step；保留旧 rank RNG，并为新增 rank 设置独立种子。数据分片、随机轨迹和归约顺序会变化，不声称逐位一致，也不把它标为从头八卡训练。')
+        text.append('扩展计划：先完成 200 epoch 的固定 CFG 和完整论文流程 FID-50K，再判断是否延长到 600 epoch。质量阈值尚未最终确定，目前没有提交或自动启动 600 epoch；200 epoch 完成后定时器继续汇报，等待扩展决定。')
+    for m in MODELS:
+        text.append(f'JiT-{m[0].upper()}/{m[1:]} 最近一次训练元数据记录为 {worlds[m]} 卡。'
+                    if metadata[m] else f'JiT-{m[0].upper()}/{m[1:]} 尚无实际训练卡数记录。')
+        if transitions[m]:
+            transition = transitions[m]
+            text.append(f'JiT-{m[0].upper()}/{m[1:]} 已在第 {transition["completed_epochs"]} 轮检查点后从 '
+                        f'{transition["from_world_size"]} 卡切换至 {transition["to_world_size"]} 卡；'
+                        f'优化器累计步数 {transition["global_step"]}，原检查点保留为 `{transition["source_checkpoint"]}`。')
     network_issue = read(REPORTS/'multinode_network_issue.json')
     network_probes = {m: read(runs[m]/'network_probe.json') for m in MODELS}
     if network_issue:
@@ -102,13 +119,12 @@ def main():
         recent = [r for r in rows if r['model'] == m][-5:]
         if recent:
             seconds = sum(r['seconds'] for r in recent) / len(recent)
-            metadata = read(runs[m]/'run_metadata.json', {})
-            model_running = str(metadata.get('slurm_job_id')) in running_ids
+            model_running = str(metadata[m].get('slurm_job_id')) in running_ids
             restart_epoch = progress[m]['completed_epochs'] if model_running else progress[m]['checkpoint_completed_epochs']
             left = max(0, 200 - restart_epoch) * seconds / 3600
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 最近 {len(recent)} 个已完成 epoch 平均 {seconds/60:.1f} 分钟；'
                         f'仅在相同吞吐下，剩余训练约 {left:.1f} 小时，不含评估、重试和排队。'
-                        '双节点 TCP 的实际训练速度尚需实测，不能直接沿用单节点耗时。')
+                        '改变卡数或节点通信方式后的速度需实测，不能直接沿用此前耗时。')
         monitors = [read(p) for p in (runs[m]/'evaluations').glob('monitor-*.json')]
         if monitors:
             metric = max(monitors, key=lambda r:r['completed_epochs'])
@@ -117,7 +133,9 @@ def main():
         if selection:
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 第 {selection["completed_epochs"]} epoch 的 EMA/CFG 搜索已完成 {selection["completed_candidates"]}/{selection["total_candidates"]} 组。')
     retired = read(REPORTS/'jobs_8gpu_retired.json')
-    if retired:
+    if retired and plan.get('standard8_enabled'):
+        text.append('此前取消的八卡旧队列维持取消；新授权的八卡 standard 候选单独登记在 jobs_flexible.json。')
+    elif retired:
         text.append('按用户明确的要求，每个训练任务总计四卡；B/16、L/16 可各用四卡并行。遗留单任务八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。')
     else:
         text.append('8 卡实验使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。')
@@ -159,7 +177,7 @@ def main():
                   f'{row["cfg"]} / {row["ema"]}' if matched else '—',
                   f'{row["delta"]:+.4f}' if matched else '—']
         text.append('| '+' | '.join(fields)+' |')
-        comparison_rows.append({'gpu_count': 4, 'run': runs[m].name, **row})
+        comparison_rows.append({'gpu_count': worlds[m], 'run': runs[m].name, **row})
     text.extend(['\n### README 固定 CFG 的 FID-50K',
                  '此表保留指定 CFG 的结果。论文的最优 EMA/CFG 随训练轮数变化，因此本表不计算论文差值；完整搜索结果见上表。',
                  '| 模型 | epoch | 固定 CFG | 选中 EMA | FID-50K |',
@@ -265,7 +283,10 @@ def main():
              '每个 50K 阶段完成后自动生成此报告并尝试提交、推送到 GitHub。单组评估结果可断点复用；推送失败记录在运行目录的 `report_publish.json`，不会中断训练。']
     (REPORTS/'REPORT.md').write_text(render_markdown(text))
     (REPORTS/'status.json').write_text(json.dumps({'updated_utc':stamp,'model_progress':progress,
-        'gpu_count':4,'gpu_count_per_job':4,'models_may_run_concurrently':True,
+        'gpu_count':None if plan.get('standard8_enabled') else 4,
+        'gpu_counts_per_candidate':[4,8] if plan.get('standard8_enabled') else [4],
+        'last_training_gpu_count_by_model':worlds,'gpu_transitions':transitions,
+        'experiment_plan':plan,'models_may_run_concurrently':True,
         'network_issue':network_issue,'network_probes':network_probes,
         'completed_models':complete,'data_ready':bool(data),'smoke':bool(smoke),'complete':len(complete)==len(MODELS),'jobs':jobs},indent=2)+'\n')
 

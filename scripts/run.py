@@ -17,6 +17,7 @@ import sys
 import time
 from evaluation_protocol import protocol_for, run_final_evaluations, validate_metric
 from resource_queue import try_model_lock
+from resume_policy import validate_resume, expansion_seed
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'vendor/JiT'))
@@ -155,6 +156,7 @@ def save_checkpoint(model, optimizer, args, epoch, global_step, loader_generator
             'status': 'trained' if epoch + 1 == args.epochs else 'training',
             'completed_epochs': epoch + 1, 'target_epochs': args.epochs,
             'global_step': global_step, 'checkpoint': str(path),
+            'world_size': dist.get_world_size(),
             'updated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat()})
     dist.barrier()
 
@@ -257,6 +259,7 @@ def main():
     parser.add_argument('--config', default=str(ROOT / 'configs/b16_200ep.json'))
     parser.add_argument('--mode', choices=['train', 'evaluate', 'smoke'], default='train')
     parser.add_argument('--smoke-steps', type=int, default=5)
+    parser.add_argument('--allow-expand-to-eight', action='store_true')
     cli = parser.parse_args()
     cfg = json.loads(Path(cli.config).read_text())
     args = argparse.Namespace(**cfg, dist_on_itp=False, dist_url='env://', distributed=True)
@@ -277,10 +280,22 @@ def main():
                 print(f'Another allocation owns {args.output_dir}; skipping this model.', flush=True)
             dist.destroy_process_group()
             return
+        # Once the eight-GPU candidate takes over, old four-GPU candidates must
+        # release their allocation instead of loading or overwriting its state.
+        route = Path(args.output_dir) / 'execution_world.json'
+        permitted = [True]
+        if rank == 0 and route.exists():
+            permitted[0] = json.loads(route.read_text())['world_size'] == world
+        dist.broadcast_object_list(permitted, src=0)
+        if not permitted[0]:
+            if rank == 0:
+                print(f'{args.output_dir} has transferred to another GPU count; skipping.', flush=True)
+            dist.destroy_process_group()
+            return
     if cli.mode != 'smoke':
         assert world in (4, 8) and args.batch_size * world * args.grad_accumulation == 1024
     # Short backfill allocations must retain completed epochs. This only changes I/O.
-    checkpoint_interval = 1 if world == 4 else args.save_every
+    checkpoint_interval = 1 if world == 4 or cli.allow_expand_to_eight else args.save_every
     torch.manual_seed(args.seed + rank)
     np.random.seed(args.seed + rank)
     random.seed(args.seed + rank)
@@ -350,23 +365,51 @@ def main():
     start_epoch, global_step = 0, 0
     if path.exists():
         checkpoint = torch.load(path, map_location='cpu', weights_only=False)
-        assert checkpoint['world_size'] == world, 'Changing GPU count changes batch/RNG semantics'
-        for key, value in cfg.items():
-            if key not in ('data_path', 'output_dir', 'num_workers'):
-                assert checkpoint['config'][key] == value, f'Resume config mismatch: {key}'
+        expanding = validate_resume(checkpoint, cfg, world, cli.allow_expand_to_eight)
         model.load_state_dict(checkpoint['model'])
         for decay, params in model.emas.items():
             state = checkpoint[f'ema_{decay}']
             for (name, _), target in zip(model.named_parameters(), params):
                 target.copy_(state[name])
         optimizer.load_state_dict(checkpoint['optimizer'])
-        restore_rng(checkpoint['rng_per_rank'][rank])
-        generator.set_state(checkpoint['rng_per_rank'][rank]['loader'])
         start_epoch, global_step = checkpoint['epoch'] + 1, checkpoint['global_step']
+        if rank < checkpoint['world_size']:
+            restore_rng(checkpoint['rng_per_rank'][rank])
+            generator.set_state(checkpoint['rng_per_rank'][rank]['loader'])
+        else:
+            seed = expansion_seed(args.seed, start_epoch, rank)
+            torch.manual_seed(seed)
+            np.random.seed(seed % (2**32))
+            random.seed(seed)
+            generator.manual_seed(seed)
+        if expanding and rank == 0:
+            # Preserve the full original checkpoint before the first eight-GPU save.
+            archive = output / f'checkpoint-before-8gpu-ep{start_epoch:03d}.pth'
+            if not archive.exists():
+                os.link(path, archive)
+            stat = path.stat()
+            atomic_json(output / 'gpu_transition.json', {
+                'from_world_size': checkpoint['world_size'], 'to_world_size': world,
+                'completed_epochs': start_epoch, 'global_step': global_step,
+                'source_checkpoint': archive.name, 'source_bytes': stat.st_size,
+                'source_mtime_ns': stat.st_mtime_ns,
+                'source_config': checkpoint['config'], 'target_config': cfg,
+                'rng_policy': 'Retain ranks 0-3; seed new ranks with seed+1000003*completed_epochs+rank',
+                'preserved': ['model', 'optimizer', 'all EMA tensors', 'epoch', 'global_step'],
+                'effective_batch': 1024, 'bitwise_continuation': False,
+                'slurm_job_id': os.environ.get('SLURM_JOB_ID'),
+                'updated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat()})
         del checkpoint
         print(f'Resumed {path}, completed epochs={start_epoch}, optimizer steps={global_step}', flush=True)
     elif cli.mode == 'evaluate':
         raise FileNotFoundError(f'Required trained checkpoint absent: {path}')
+    if cli.allow_expand_to_eight:
+        assert world == 8
+        if rank == 0:
+            atomic_json(output / 'execution_world.json', {'world_size': 8,
+                'slurm_job_id': os.environ.get('SLURM_JOB_ID'),
+                'updated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat()})
+        dist.barrier()
     if cli.mode == 'train':
         manifest = json.loads((Path(args.data_path) / 'manifest.json').read_text())
         assert manifest['status'] == 'ready' and manifest['images'] == 1281167

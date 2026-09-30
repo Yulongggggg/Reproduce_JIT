@@ -23,13 +23,22 @@ class ResourceQueueTests(unittest.TestCase):
             self.assertEqual(subprocess.run(command, cwd=Path(__file__).parent).returncode, 0)
 
     def test_both_shapes_keep_four_gpus_and_forty_cpu_cores(self):
-        for profile, (nodes, gpus, cpus, _) in queue.PROFILES.items():
+        for profile in ('single', 'split'):
+            nodes, gpus, cpus, _ = queue.PROFILES[profile]
             self.assertEqual(nodes*gpus, 4)
             self.assertEqual(nodes*cpus, 40)
             command = queue.sbatch_command('l16', profile, 1234)
             self.assertIn('--dependency=afternotok:1234', command)
             self.assertIn('--time-min=03:00:00', command)
             self.assertEqual(command[-2:], ['l16', profile])
+
+    def test_standard_requests_eight_gpus_and_24_to_48_hours(self):
+        command = queue.sbatch_command('b16', 'standard8', 1234)
+        for flag in ('--qos=standard', '--nodes=1', '--gres=gpu:8',
+                     '--time=2-00:00:00', '--time-min=1-00:00:00',
+                     '--dependency=afternotok:1234'):
+            self.assertIn(flag, command)
+        self.assertEqual(command[-2:], ['b16', 'standard8'])
 
     def test_duplicate_submission_reuses_existing_job(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -80,6 +89,34 @@ class ResourceQueueTests(unittest.TestCase):
                 self.assertEqual(queue.worker('l16', 'single'), 0)
                 submit.assert_not_called()
                 run.assert_not_called()
+
+    def test_four_gpu_worker_skips_after_eight_gpu_takeover(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, output = self.prepare(directory)
+            output.mkdir(parents=True)
+            (output/'execution_world.json').write_text('{"world_size":8}')
+            with patch.object(queue, 'ROOT', root), patch.object(queue, 'submit') as submit, \
+                 patch.object(queue.subprocess, 'run') as run:
+                self.assertEqual(queue.worker('l16', 'single'), 0)
+                submit.assert_not_called()
+                run.assert_not_called()
+
+    def test_standard_worker_shares_model_lock_and_enables_expansion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, output = self.prepare(directory)
+            (root/'configs/l16_8gpu_standard_200ep.json').write_text(json.dumps({'output_dir': 'runs/l16'}))
+            def run(command, **kwargs):
+                self.assertIsNone(queue.try_model_lock(output))
+                if command[0] == 'torchrun':
+                    self.assertIn('--nproc_per_node=8', command)
+                    self.assertIn('--allow-expand-to-eight', command)
+                    self.assertEqual(kwargs['env']['JIT_ALLOCATION_LOCK_HELD'], '1')
+                    (output/'summary.json').write_text('{"status":"complete"}')
+                return subprocess.CompletedProcess(command, 0)
+            with patch.object(queue, 'ROOT', root), patch.object(queue, 'submit', return_value=5678), \
+                 patch.dict(os.environ, {'SLURM_JOB_ID':'1234'}), \
+                 patch.object(queue.subprocess, 'run', side_effect=run):
+                self.assertEqual(queue.worker('l16', 'standard8'), 0)
 
     def test_timeout_continues_but_three_crashes_stop(self):
         jobs = {'jobs': [{'job_id': i, 'predecessor': i-1} for i in range(2, 5)]}

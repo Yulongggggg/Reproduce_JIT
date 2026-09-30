@@ -60,6 +60,15 @@ class ReportTimerTests(unittest.TestCase):
             with patch.object(tick, 'comparison', return_value={'status': 'matched'}):
                 self.assertTrue(tick.finished())
 
+    def test_timer_keeps_reporting_while_600_epoch_decision_is_pending(self):
+        def read(path, default=None):
+            if path.name == 'experiment_plan.json':
+                return {'extension_600': {'status': 'pending_200_results_and_decision'}}
+            return {'status': 'complete'}
+        with patch.object(tick, 'read', side_effect=read), \
+             patch.object(tick, 'comparison', return_value={'status':'matched'}):
+            self.assertFalse(tick.finished())
+
 
 if __name__ == '__main__':
     unittest.main()

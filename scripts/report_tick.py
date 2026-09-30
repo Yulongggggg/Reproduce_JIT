@@ -25,9 +25,10 @@ PROMPT = '''【用户已授权的 JiT 每 6 小时定时汇报】
 读取真实 Slurm 状态、训练日志、检查点和评估文件，区分正在运行、排队和故障；说明 B/16 与 L/16 各自进度、GPU 数及剩余时间。超时后可能从较早检查点重跑，不能把历史日志最大轮数当成当前正在执行的轮数。
 仅用真实的、同模型/分辨率/epoch/评估协议的 FID-50K 与论文比较，给出绝对差值及百分比。官方 Table 6 的 200 epoch 基准：B/16=4.37，L/16=2.79。未找到可直接对照的官方 100 epoch 基准，不拿 100 epoch 对比 200 epoch。8K 仅是监测或选参数据，不可冒充 50K；没有正式结果时直说尚不能判断是否接近官方。
 保留 B/16 CFG=2.9、L/16 CFG=2.4 的固定 CFG 结果，并分别报告论文 EMA/CFG 搜索流程的结果。必要时排查真实故障，但不重复提交运行/排队中的训练，不随意修改训练超参。
-用户已授权主动寻找资源并增加候选。同时读取 reports/jobs_flexible.json，追踪单节点四卡/双节点各两卡候选；它们使用同模型互斥锁，可让 B/16、L/16 并行。发现某模型仍未完成却已无运行/待运行候选时，可通过 scripts/resource_queue.py 的幂等 submit 恢复候选，禁止绕过模型锁。固定 world_size=4、有效 batch=1024，不重复从头训练。
-用户已明确是每个训练任务总计四卡，B/16、L/16 可各用四卡并行，并非整个项目只能同时用四卡。遗留单任务八卡队列已取消，不得重新提交或恢复单任务八卡任务。
-本次是已安装定时器的正常触发，不要重新创建定时器，也不需要再次询问汇报授权。使用 bash scripts/publish.sh 更新 GitHub。B/16、L/16 的 200 epoch 训练和正式对照均完成后，给最终总结并确认此定时器已经停止。'''
+用户最新授权单任务八卡 standard 备选，并保留既有四卡 priority 候选。long 方案已放弃，未提交。读取 reports/experiment_plan.json 和 reports/jobs_flexible.json；standard8 是单节点八卡、24–48 小时，single/split 是四卡候选。所有候选共用同模型锁；八卡接手后 execution_world.json 限制旧四卡入口跳过该模型。固定有效 batch=1024，四转八保留模型、优化器、EMA 与训练进度，随机轨迹不逐位相同。不得从头重复训练，也不得恢复已取消的旧八卡链。
+未完成的模型若没有适用 GPU 数的运行/待运行候选，可通过 scripts/resource_queue.py 的幂等 submit 恢复候选，禁止绕过模型锁或擅自改变 QoS、训练超参。
+用户希望 200 epoch 效果好时续到 600 epoch。质量阈值尚未最终确定，先报告真实的 200 epoch FID-50K，再确定扩展；不得用 8K 决定是否扩展。600 epoch 同轮数官方参考为 B/16=3.66、L/16=2.36。
+本次是已安装定时器的正常触发，不要重新创建定时器，也不需要再次询问汇报授权。使用 bash scripts/publish.sh 更新 GitHub。600 epoch 扩展决定尚未完成时不要在 200 epoch 后停止定时器；仅在用户最终确定的训练和正式对照全部完成后停止并确认。'''
 
 
 def read(path, default=None):
@@ -54,6 +55,9 @@ def next_due(now):
 
 
 def finished():
+    plan = read(ROOT/'reports/experiment_plan.json', {})
+    if plan.get('extension_600', {}).get('status') == 'pending_200_results_and_decision':
+        return False
     for model in ('b16', 'l16'):
         summary = read(ROOT/f'runs/{model}_4gpu_200ep/summary.json')
         cfg = read(ROOT/f'configs/{model}_4gpu_200ep.json')
@@ -94,9 +98,9 @@ def refresh_jobs():
     if running:
         status = '正在运行：' + '；'.join(f'{i} ({states[i]["node_or_reason"]})' for i in running) + '。'
     elif pending:
-        status = f'目前没有四卡训练作业运行；续跑作业 {pending[0]} 正在排队（{states[pending[0]]["node_or_reason"]}）。'
+        status = f'目前没有 JiT 训练作业运行；候选作业 {pending[0]} 正在排队（{states[pending[0]]["node_or_reason"]}）。'
     else:
-        status = '四卡训练链当前没有运行或排队的作业；需结合完成状态判断是否结束或异常。'
+        status = 'JiT 候选当前没有运行或排队的作业；需结合完成状态判断是否结束或异常。'
     jobs['pipeline_note'] = f'{stamp} 自动检查：{status} 训练历史最大轮数和可恢复检查点分别列出。'
     write(path, jobs)
 

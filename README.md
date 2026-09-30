@@ -62,7 +62,11 @@ Slurm job script 对应当前集群账号。原四卡脚本为 `scripts/train4.s
 
 每模型的 `.allocation.lock` 覆盖原入口与新入口：同时分配到资源的候选中，仅一个能训练/评估并写该模型检查点，另一个立即释放；B/16 和 L/16 使用不同锁，可以并行。新入口先提交唯一的 `afternotok` 后继，再运行训练；超时/失败后自动续跑，模型全部评估完成则取消自己的待运行后继。连续三次程序失败或 OOM 会停止该候选自动重试并在报告中标出，以免错误循环消耗 GPU；正常 TIMEOUT 不受此限制。四卡训练改为每个 epoch 保存，以减少短时段退出时丢失的进度；模型和训练超参不变。额外任务登记在 `reports/jobs_flexible.json`，六小时汇报和 GitHub 报告同时追踪它们。
 
-用户已明确：**每个训练任务四卡**，B/16、L/16 可各用四卡并行。`--time-min` 的较短时段由 Slurm backfill 决定，[官方说明](https://slurm.schedmd.com/sbatch.html#OPT_time-min)。最近资源分配快照见 [resource_snapshot.json](reports/resource_snapshot.json)。
+2026-09-30 用户增加了**每任务八卡 standard** 方案：保留四卡 priority 候选，B/16、L/16 各增加一个 `standard8` 备选（单节点八卡、72 CPU、512 GiB、24–48 小时），同一模型仍共用原目录及文件锁。`--time-min` 的较短时段由 Slurm backfill 决定，[官方说明](https://slurm.schedmd.com/sbatch.html#OPT_time-min)。最近资源分配快照见 [resource_snapshot.json](reports/resource_snapshot.json)。
+
+八卡入口通过显式 `--allow-expand-to-eight` 允许从完整四卡检查点接续，保留模型、优化器、三组 EMA、epoch 和 global step，并将原检查点硬链接归档。B/16 累积从 2 次改为 1 次，L/16 从 4 次改为 2 次，有效 batch 保持 1024；原四个 rank 的 RNG 保留，新增 rank 使用可复现的独立种子。随机轨迹与归约顺序会变化，不承诺逐位一致。切换记录保存在 `gpu_transition.json`；`execution_world.json` 防止后续四卡候选覆盖八卡状态。八卡只在实际获得锁和资源时接手，不提前改动 184 轮检查点。
+
+`standard8` 使用相同的幂等提交器：`.env/bin/python scripts/resource_queue.py submit b16 standard8`（L/16 替换为 `l16`）。先完成 200 epoch 与正式 FID-50K；用户希望效果好时扩展到 600 epoch，质量阈值尚未最终确定，当前未自动扩展或提交 600 epoch。计划和同轮数参考值见 [experiment_plan.json](reports/experiment_plan.json)。
 
 2026-09-29 首次双节点分配的 B/16、L/16 启动均因 `ibv_modify_qp: Invalid argument errno 22` 失败，未进入训练。双节点入口现使用 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket` 绕过出错的 IB/RoCE 路径；这些变量的含义见 [NCCL 2.21.5 官方说明](https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2215/user-guide/docs/env.html#nccl-ib-disable)。单节点入口及节点内 P2P/NVLink 设置不变。下次双节点分配先验证四卡 1 MiB all-reduce，再保存实际节点、GPU、通信环境与校验结果到运行目录的 `network_probe.json`。当前配置变更不是 GPU 验证通过的证据；实际状态见 [报告](reports/REPORT.md)，TCP 训练速度需重新实测。既有待运行作业会读取更新后的共享脚本，无需重复提交。
 

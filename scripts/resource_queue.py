@@ -10,7 +10,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / 'reports/jobs_flexible.json'
-PROFILES = {'single': (1, 4, 40, '256G'), 'split': (2, 2, 20, '128G')}
+PROFILES = {'single': (1, 4, 40, '256G'), 'split': (2, 2, 20, '128G'),
+            'standard8': (1, 8, 72, '512G')}
 
 
 def read(path, default=None):
@@ -39,12 +40,16 @@ def sbatch_command(model, profile, dependency=None):
     if model not in ('b16', 'l16') or profile not in PROFILES:
         raise ValueError('Unsupported model or allocation profile')
     nodes, gpus, cpus, memory = PROFILES[profile]
+    standard8 = profile == 'standard8'
     command = ['sbatch', '--parsable', f'--job-name=jit_{model}_{profile}',
-               '--partition=alpha', '--account=co_carson_aiaided', '--qos=priority',
+               '--partition=alpha', '--account=co_carson_aiaided',
+               '--qos=standard' if standard8 else '--qos=priority',
                f'--nodes={nodes}', f'--ntasks={nodes}', '--ntasks-per-node=1',
                f'--cpus-per-task={cpus}', f'--gres=gpu:{gpus}',
-               '--constraint=h100|h200', f'--mem={memory}', '--time=12:00:00',
-               '--time-min=02:00:00' if model == 'b16' else '--time-min=03:00:00',
+               '--constraint=h100|h200', f'--mem={memory}',
+               '--time=2-00:00:00' if standard8 else '--time=12:00:00',
+               '--time-min=1-00:00:00' if standard8 else
+               ('--time-min=02:00:00' if model == 'b16' else '--time-min=03:00:00'),
                '--output=logs/flexible-%j.log',
                '--chdir=' + str(ROOT)]
     if dependency:
@@ -94,9 +99,13 @@ def submit(model, profile, dependency=None):
         job_id = int(subprocess.check_output(command, cwd=ROOT, text=True,
                                              timeout=60).strip().split(';')[0])
         record['jobs'].append({'job_id': job_id, 'model': model, 'profile': profile,
-                              'predecessor': dependency, 'gpu_count': 4,
+                              'predecessor': dependency,
+                              'gpu_count': PROFILES[profile][0]*PROFILES[profile][1],
+                              'qos': 'standard' if profile == 'standard8' else 'priority',
                               'nodes': PROFILES[profile][0],
                               'submitted_utc': dt.datetime.now(dt.timezone.utc).isoformat()})
+        if profile == 'standard8':
+            record['purpose'] = 'Four-GPU priority and eight-GPU standard candidates sharing per-model checkpoints'
         temporary = RECORD.with_suffix('.tmp')
         temporary.write_text(json.dumps(record, indent=2) + '\n')
         temporary.replace(RECORD)
@@ -105,7 +114,8 @@ def submit(model, profile, dependency=None):
 
 
 def worker(model, profile):
-    config = ROOT / f'configs/{model}_4gpu_200ep.json'
+    suffix = '8gpu_standard_200ep' if profile == 'standard8' else '4gpu_200ep'
+    config = ROOT / f'configs/{model}_{suffix}.json'
     cfg = read(config)
     output = ROOT / cfg['output_dir']
     allocation_lock = try_model_lock(output)
@@ -114,6 +124,11 @@ def worker(model, profile):
         return 0
     # Keep allocation_lock alive until torchrun and all its children have exited.
     with allocation_lock:
+        expected_world = PROFILES[profile][0]*PROFILES[profile][1]
+        route = read(output/'execution_world.json', {})
+        if route.get('world_size', expected_world) != expected_world:
+            print(f'{model} already transferred to {route["world_size"]} GPUs; releasing allocation.', flush=True)
+            return 0
         if read(output/'summary.json', {}).get('status') == 'complete':
             print(f'{model} already complete; releasing allocation.', flush=True)
             return 0
@@ -135,9 +150,11 @@ def worker(model, profile):
                 'updated_utc': dt.datetime.now(dt.timezone.utc).isoformat()}, indent=2) + '\n')
             print(f'Continuation submission failed; using current allocation: {error}', flush=True)
         environment = dict(os.environ, JIT_ALLOCATION_LOCK_HELD='1')
-        if profile == 'single':
-            command = ['torchrun', '--standalone', '--nproc_per_node=4',
+        if profile in ('single', 'standard8'):
+            command = ['torchrun', '--standalone', f'--nproc_per_node={expected_world}',
                        'scripts/run.py', '--mode', 'train', '--config', str(config)]
+            if profile == 'standard8':
+                command.append('--allow-expand-to-eight')
         else:
             hosts = subprocess.check_output(['scontrol', 'show', 'hostnames',
                 os.environ['SLURM_JOB_NODELIST']], text=True, timeout=30).splitlines()
