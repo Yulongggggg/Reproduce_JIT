@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-30T18:16:17.620052+00:00",
+  "updated_utc": "2026-09-30T18:30:32.901657+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -198,10 +198,10 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101984,
-    "pipeline_note": "2026-09-30 14:10 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-09-30 14:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 101983,
-    "queue_checked_utc": "2026-09-30T18:10:58.814457+00:00",
+    "queue_checked_utc": "2026-09-30T18:30:32.469475+00:00",
     "queue_snapshot": {
       "107751": {
         "state": "PENDING",
@@ -259,11 +259,11 @@
         "state": "PENDING",
         "node_or_reason": "(Dependency)"
       },
-      "110832": {
+      "110833": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
       },
-      "110833": {
+      "110832": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
       }
