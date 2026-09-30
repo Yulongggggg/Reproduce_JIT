@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-30T20:15:32.653525+00:00",
+  "updated_utc": "2026-09-30T23:03:34.195998+00:00",
   "standard8_enabled": true,
   "preserve_existing_priority_four_gpu_candidates": true,
   "standard8": {
@@ -19,17 +19,17 @@
         "model": "b16",
         "job_id": 110832,
         "state_at_check": "PENDING",
-        "estimated_start_local": "2026-10-05T01:50:00-04:00"
+        "estimated_start_local": null
       },
       {
         "model": "l16",
         "job_id": 110833,
         "state_at_check": "PENDING",
-        "estimated_start_local": "2026-10-05T05:05:00-04:00"
+        "estimated_start_local": null
       }
     ],
-    "estimate_checked_local": "2026-09-30T16:15:05-04:00",
-    "estimate_note": "Actual submitted job estimates; not a reservation guarantee. They supersede the earlier test-only estimates."
+    "estimate_checked_local": "2026-09-30T19:02:13-04:00",
+    "estimate_note": "Slurm currently reports N/A for both eight-GPU jobs; previous October 5 estimates are no longer current. L/16 four-GPU priority job 107751 is actually running."
   },
   "first_target_epochs": 200,
   "effective_batch": 1024,

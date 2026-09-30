@@ -1,12 +1,10 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-09-30T20:15:34.498082+00:00
+更新时间：2026-09-30T23:03:35.192893+00:00
 
 ## 当前进度
 
 **已完成训练与最终评估：0/2。** 目录沿用原四卡路径；实际训练卡数以运行元数据为准。训练轮数取自逐轮日志，每轮保存检查点，异常退出后从检查点恢复：
-
-**当前候选任务在排队，没有正在运行的 JiT 训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。
 
 用户最新安排：保留已有四卡 priority 队列，增加 B/16、L/16 各一个单节点八卡 standard 备选，申请 24–48 小时。long 方案仅做过预检查，未提交。所有候选共享同模型文件锁；八卡实际接手后，旧四卡候选跳过该模型，不重复训练。
 
@@ -16,7 +14,7 @@
 
 JiT-B/16 最近一次训练元数据记录为 4 卡。
 
-JiT-L/16 尚无实际训练卡数记录。
+JiT-L/16 最近一次训练元数据记录为 4 卡。
 
 **跨节点启动故障：B/16 作业 107750（FAILED）；L/16 作业 107752（FAILED）。** 两个任务在美东 2026-09-29 14:37 先后获分配，各用 4 张 H200（2 节点各 2 卡），均在初始 NCCL barrier 报 `ibv_modify_qp: Invalid argument errno 22`，尚未进入训练，未推进检查点。已仅为双节点入口配置 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket`，下一次分配后先做真实四卡 all-reduce 检查。故障证据与配置范围见 [记录](multinode_network_issue.json)。
 
@@ -28,11 +26,13 @@ JiT-L/16 TCP 替代方案尚无真实 GPU 验证结果，不能宣称故障已�
 
 - JiT-B/16：训练历史日志最高完成 184/200 epochs；可恢复检查点为第 184 轮。
 
-- JiT-L/16：训练历史日志最高完成 0/200 epochs；可恢复检查点为第 0 轮。
+- JiT-L/16：训练历史日志最高完成 9/200 epochs；可恢复检查点为第 9 轮。
 
 JiT-B/16 最近 5 个已完成 epoch 平均 5.8 分钟；仅在相同吞吐下，剩余训练约 1.5 小时，不含评估、重试和排队。改变卡数或节点通信方式后的速度需实测，不能直接沿用此前耗时。
 
 JiT-B/16 第 160 epoch 中途评估：FID-8000=8.9342，CFG=2.9，EMA=0.9996。这是中途 8K 指标，不能作为最终 FID-50K 结果。
+
+JiT-L/16 最近 5 个已完成 epoch 平均 14.2 分钟；仅在相同吞吐下，剩余训练约 45.1 小时，不含评估、重试和排队。改变卡数或节点通信方式后的速度需实测，不能直接沿用此前耗时。
 
 此前取消的八卡旧队列维持取消；新授权的八卡 standard 候选单独登记在 jobs_flexible.json。
 
@@ -47,10 +47,10 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-107751 jit_l16_single PENDING (Priority)
 101984 jit_b16_l16_4gpu PENDING (Priority)
 109179 jit_b16_split PENDING (Priority)
 109184 jit_l16_split PENDING (Priority)
+111067 jit_l16_single PENDING (Dependency)
 101994 jit_b16_l16_4gpu PENDING (Dependency)
 101993 jit_b16_l16_4gpu PENDING (Dependency)
 101992 jit_b16_l16_4gpu PENDING (Dependency)
@@ -63,9 +63,10 @@ Slurm 队列：
 101985 jit_b16_l16_4gpu PENDING (Dependency)
 110833 jit_l16_standard8 PENDING (Priority)
 110832 jit_b16_standard8 PENDING (Priority)
+107751 jit_l16_single RUNNING alphagpu23
 ```
 
-流水线记录：2026-09-30 16:15 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
+流水线记录：2026-09-30 19:03 EDT 自动检查：正在运行：107751 (alphagpu23)。 训练历史最大轮数和可恢复检查点分别列出。
 
 ## 预注册设置
 

@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-30T20:15:34.498082+00:00",
+  "updated_utc": "2026-09-30T23:03:35.192893+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -12,11 +12,15 @@
       "checkpoint_updated_utc": "2026-09-29T07:05:14.456700+00:00"
     },
     "l16": {
-      "completed_epochs": 0,
-      "status": "not_started",
-      "checkpoint_completed_epochs": 0,
-      "checkpoint_global_step": 0,
-      "checkpoint_updated_utc": null
+      "status": "training",
+      "completed_epochs": 9,
+      "target_epochs": 200,
+      "global_step": 11259,
+      "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/l16_4gpu_200ep/checkpoint-last.pth",
+      "world_size": 4,
+      "checkpoint_completed_epochs": 9,
+      "checkpoint_global_step": 11259,
+      "checkpoint_updated_utc": "2026-09-30T22:54:27.123191+00:00"
     }
   },
   "gpu_count": null,
@@ -33,7 +37,7 @@
     "l16": null
   },
   "experiment_plan": {
-    "updated_utc": "2026-09-30T20:15:32.653525+00:00",
+    "updated_utc": "2026-09-30T23:03:34.195998+00:00",
     "standard8_enabled": true,
     "preserve_existing_priority_four_gpu_candidates": true,
     "standard8": {
@@ -53,17 +57,17 @@
           "model": "b16",
           "job_id": 110832,
           "state_at_check": "PENDING",
-          "estimated_start_local": "2026-10-05T01:50:00-04:00"
+          "estimated_start_local": null
         },
         {
           "model": "l16",
           "job_id": 110833,
           "state_at_check": "PENDING",
-          "estimated_start_local": "2026-10-05T05:05:00-04:00"
+          "estimated_start_local": null
         }
       ],
-      "estimate_checked_local": "2026-09-30T16:15:05-04:00",
-      "estimate_note": "Actual submitted job estimates; not a reservation guarantee. They supersede the earlier test-only estimates."
+      "estimate_checked_local": "2026-09-30T19:02:13-04:00",
+      "estimate_note": "Slurm currently reports N/A for both eight-GPU jobs; previous October 5 estimates are no longer current. L/16 four-GPU priority job 107751 is actually running."
     },
     "first_target_epochs": 200,
     "effective_batch": 1024,
@@ -198,15 +202,11 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101984,
-    "pipeline_note": "2026-09-30 16:15 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
-    "active_train_job_id": null,
+    "pipeline_note": "2026-09-30 19:03 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u6b63\u5728\u8fd0\u884c\uff1a107751 (alphagpu23)\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "active_train_job_id": 107751,
     "last_timed_out_job_id": 101983,
-    "queue_checked_utc": "2026-09-30T20:15:34.047511+00:00",
+    "queue_checked_utc": "2026-09-30T23:03:34.709228+00:00",
     "queue_snapshot": {
-      "107751": {
-        "state": "PENDING",
-        "node_or_reason": "(Priority)"
-      },
       "101984": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
@@ -218,6 +218,10 @@
       "109184": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
+      },
+      "111067": {
+        "state": "PENDING",
+        "node_or_reason": "(Dependency)"
       },
       "101994": {
         "state": "PENDING",
@@ -266,9 +270,15 @@
       "110832": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
+      },
+      "107751": {
+        "state": "RUNNING",
+        "node_or_reason": "alphagpu23"
       }
     },
-    "active_train_job_ids": [],
+    "active_train_job_ids": [
+      107751
+    ],
     "additional_job_ids": [
       107750,
       107751,
@@ -276,7 +286,8 @@
       109179,
       109184,
       110832,
-      110833
+      110833,
+      111067
     ]
   }
 }
