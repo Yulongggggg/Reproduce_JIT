@@ -1,5 +1,5 @@
 {
-  "purpose": "Four-GPU candidates sharing per-model checkpoints",
+  "purpose": "Four-GPU priority and eight-GPU standard candidates sharing per-model checkpoints",
   "global_batch": 1024,
   "jobs": [
     {
@@ -46,6 +46,26 @@
       "gpu_count": 4,
       "nodes": 2,
       "submitted_utc": "2026-09-29T18:37:55.180216+00:00"
+    },
+    {
+      "job_id": 110832,
+      "model": "b16",
+      "profile": "standard8",
+      "predecessor": null,
+      "gpu_count": 8,
+      "qos": "standard",
+      "nodes": 1,
+      "submitted_utc": "2026-09-30T18:03:17.160107+00:00"
+    },
+    {
+      "job_id": 110833,
+      "model": "l16",
+      "profile": "standard8",
+      "predecessor": null,
+      "gpu_count": 8,
+      "qos": "standard",
+      "nodes": 1,
+      "submitted_utc": "2026-09-30T18:03:17.565522+00:00"
     }
   ]
 }

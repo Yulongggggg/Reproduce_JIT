@@ -1,0 +1,54 @@
+{
+  "updated_utc": "2026-09-30T18:00:06.271474+00:00",
+  "standard8_enabled": true,
+  "preserve_existing_priority_four_gpu_candidates": true,
+  "standard8": {
+    "qos": "standard",
+    "nodes": 1,
+    "gpus_per_node": 8,
+    "cpu_cores": 72,
+    "memory": "512G",
+    "time_max_hours": 48,
+    "time_min_hours": 24,
+    "models": [
+      "b16",
+      "l16"
+    ]
+  },
+  "first_target_epochs": 200,
+  "effective_batch": 1024,
+  "fixed_cfg": {
+    "b16": 2.9,
+    "l16": 2.4
+  },
+  "checkpoint_policy": "Shared per-model lock; continue saved optimizer/model/EMAs; archive original four-GPU checkpoint. Four-GPU candidates skip a model after the eight-GPU takeover.",
+  "extension_600": {
+    "requested": true,
+    "status": "pending_200_results_and_decision",
+    "proposed_max_relative_fid_gap": 0.1,
+    "threshold_confirmed": false,
+    "auto_extend": false,
+    "official_200_fid50k": {
+      "b16": 4.37,
+      "l16": 2.79
+    },
+    "official_600_fid50k": {
+      "b16": 3.66,
+      "l16": 2.36
+    }
+  },
+  "preflight_estimates": {
+    "checked_local": "2026-09-30",
+    "standard8_single": "2026-10-09T08:43:23-04:00",
+    "standard8_two_nodes": "2026-10-09T00:49:50-04:00",
+    "long8_single": "2026-10-18T08:22:23-04:00",
+    "priority8_single": "2026-10-04T07:14:23-04:00",
+    "note": "Slurm test-only estimates, not submitted jobs or promised start times. long abandoned; existing priority four-GPU candidates retained.",
+    "standard8_final_profile": "2026-10-09T04:28:23-04:00"
+  },
+  "validation": {
+    "cpu_tests_passed": 25,
+    "real_b16_checkpoint_cpu_validation": "passed",
+    "gpu_eight_card_continuation": "pending actual allocation"
+  }
+}
