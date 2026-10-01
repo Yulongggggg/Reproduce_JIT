@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-30T23:03:35.192893+00:00",
+  "updated_utc": "2026-10-01T00:02:37.327703+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -13,14 +13,14 @@
     },
     "l16": {
       "status": "training",
-      "completed_epochs": 9,
+      "completed_epochs": 12,
       "target_epochs": 200,
-      "global_step": 11259,
+      "global_step": 15012,
       "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/l16_4gpu_200ep/checkpoint-last.pth",
       "world_size": 4,
-      "checkpoint_completed_epochs": 9,
-      "checkpoint_global_step": 11259,
-      "checkpoint_updated_utc": "2026-09-30T22:54:27.123191+00:00"
+      "checkpoint_completed_epochs": 12,
+      "checkpoint_global_step": 15012,
+      "checkpoint_updated_utc": "2026-09-30T23:37:29.675090+00:00"
     }
   },
   "gpu_count": null,
@@ -202,10 +202,10 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 101984,
-    "pipeline_note": "2026-09-30 19:03 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u6b63\u5728\u8fd0\u884c\uff1a107751 (alphagpu23)\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
-    "active_train_job_id": 107751,
-    "last_timed_out_job_id": 101983,
-    "queue_checked_utc": "2026-09-30T23:03:34.709228+00:00",
+    "pipeline_note": "2026-09-30 20:02 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 101984 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "active_train_job_id": null,
+    "last_timed_out_job_id": 107751,
+    "queue_checked_utc": "2026-10-01T00:02:36.850597+00:00",
     "queue_snapshot": {
       "101984": {
         "state": "PENDING",
@@ -221,7 +221,7 @@
       },
       "111067": {
         "state": "PENDING",
-        "node_or_reason": "(Dependency)"
+        "node_or_reason": "(Priority)"
       },
       "101994": {
         "state": "PENDING",
@@ -270,15 +270,9 @@
       "110832": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
-      },
-      "107751": {
-        "state": "RUNNING",
-        "node_or_reason": "alphagpu23"
       }
     },
-    "active_train_job_ids": [
-      107751
-    ],
+    "active_train_job_ids": [],
     "additional_job_ids": [
       107750,
       107751,
