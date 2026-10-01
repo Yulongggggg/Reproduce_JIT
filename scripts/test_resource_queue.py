@@ -40,6 +40,30 @@ class ResourceQueueTests(unittest.TestCase):
             self.assertIn(flag, command)
         self.assertEqual(command[-2:], ['b16', 'standard8'])
 
+    def test_long_requests_eight_gpus_and_48_hours_to_seven_days(self):
+        command = queue.sbatch_command('l16', 'long8', 1234)
+        for flag in ('--qos=long', '--nodes=1', '--gres=gpu:8',
+                     '--time=7-00:00:00', '--time-min=2-00:00:00',
+                     '--dependency=afternotok:1234'):
+            self.assertIn(flag, command)
+        self.assertEqual(command[-2:], ['l16', 'long8'])
+
+    def test_disabled_profiles_cannot_submit_or_launch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root/'reports').mkdir()
+            with patch.object(queue, 'ROOT', root), \
+                 patch.object(queue.subprocess, 'check_output') as check, \
+                 patch.object(queue.subprocess, 'run') as run:
+                for enabled in ('long8', 'standard8'):
+                    (root/'reports/experiment_plan.json').write_text(json.dumps({'enabled_profiles':[enabled]}))
+                    for profile in set(queue.PROFILES) - {enabled}:
+                        with self.assertRaises(ValueError):
+                            queue.submit('b16', profile)
+                        self.assertEqual(queue.worker('b16', profile), 0)
+                check.assert_not_called()
+                run.assert_not_called()
+
     def test_duplicate_submission_reuses_existing_job(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -101,7 +125,7 @@ class ResourceQueueTests(unittest.TestCase):
                 submit.assert_not_called()
                 run.assert_not_called()
 
-    def test_standard_worker_shares_model_lock_and_enables_expansion(self):
+    def check_eight_gpu_worker(self, profile):
         with tempfile.TemporaryDirectory() as directory:
             root, output = self.prepare(directory)
             (root/'configs/l16_8gpu_standard_200ep.json').write_text(json.dumps({'output_dir': 'runs/l16'}))
@@ -116,7 +140,13 @@ class ResourceQueueTests(unittest.TestCase):
             with patch.object(queue, 'ROOT', root), patch.object(queue, 'submit', return_value=5678), \
                  patch.dict(os.environ, {'SLURM_JOB_ID':'1234'}), \
                  patch.object(queue.subprocess, 'run', side_effect=run):
-                self.assertEqual(queue.worker('l16', 'standard8'), 0)
+                self.assertEqual(queue.worker('l16', profile), 0)
+
+    def test_standard_worker_shares_model_lock_and_enables_expansion(self):
+        self.check_eight_gpu_worker('standard8')
+
+    def test_long_worker_shares_model_lock_and_enables_expansion(self):
+        self.check_eight_gpu_worker('long8')
 
     def test_timeout_continues_but_three_crashes_stop(self):
         jobs = {'jobs': [{'job_id': i, 'predecessor': i-1} for i in range(2, 5)]}

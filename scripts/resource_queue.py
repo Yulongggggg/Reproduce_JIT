@@ -11,7 +11,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / 'reports/jobs_flexible.json'
 PROFILES = {'single': (1, 4, 40, '256G'), 'split': (2, 2, 20, '128G'),
-            'standard8': (1, 8, 72, '512G')}
+            'standard8': (1, 8, 72, '512G'), 'long8': (1, 8, 72, '512G')}
+
+
+def profile_enabled(profile):
+    plan = read(ROOT / 'reports/experiment_plan.json', {})
+    return profile in plan.get('enabled_profiles', PROFILES)
 
 
 def read(path, default=None):
@@ -41,15 +46,16 @@ def sbatch_command(model, profile, dependency=None):
         raise ValueError('Unsupported model or allocation profile')
     nodes, gpus, cpus, memory = PROFILES[profile]
     standard8 = profile == 'standard8'
+    long8 = profile == 'long8'
     command = ['sbatch', '--parsable', f'--job-name=jit_{model}_{profile}',
                '--partition=alpha', '--account=co_carson_aiaided',
-               '--qos=standard' if standard8 else '--qos=priority',
+               '--qos=long' if long8 else ('--qos=standard' if standard8 else '--qos=priority'),
                f'--nodes={nodes}', f'--ntasks={nodes}', '--ntasks-per-node=1',
                f'--cpus-per-task={cpus}', f'--gres=gpu:{gpus}',
                '--constraint=h100|h200', f'--mem={memory}',
-               '--time=2-00:00:00' if standard8 else '--time=12:00:00',
-               '--time-min=1-00:00:00' if standard8 else
-               ('--time-min=02:00:00' if model == 'b16' else '--time-min=03:00:00'),
+               '--time=7-00:00:00' if long8 else ('--time=2-00:00:00' if standard8 else '--time=12:00:00'),
+               '--time-min=2-00:00:00' if long8 else ('--time-min=1-00:00:00' if standard8 else
+               ('--time-min=02:00:00' if model == 'b16' else '--time-min=03:00:00')),
                '--output=logs/flexible-%j.log',
                '--chdir=' + str(ROOT)]
     if dependency:
@@ -80,6 +86,8 @@ def submit(model, profile, dependency=None):
     lock_path.parent.mkdir(exist_ok=True)
     with lock_path.open('a') as handle:
         fcntl.flock(handle, fcntl.LOCK_EX)
+        if not profile_enabled(profile):
+            raise ValueError(f'Allocation profile {profile} disabled by experiment_plan.json')
         record = read(RECORD, {'purpose': 'Four-GPU candidates sharing per-model checkpoints',
                               'global_batch': 1024, 'jobs': []})
         candidates = [job for job in record['jobs'] if job['model'] == model
@@ -101,11 +109,13 @@ def submit(model, profile, dependency=None):
         record['jobs'].append({'job_id': job_id, 'model': model, 'profile': profile,
                               'predecessor': dependency,
                               'gpu_count': PROFILES[profile][0]*PROFILES[profile][1],
-                              'qos': 'standard' if profile == 'standard8' else 'priority',
+                              'qos': 'long' if profile == 'long8' else ('standard' if profile == 'standard8' else 'priority'),
                               'nodes': PROFILES[profile][0],
                               'submitted_utc': dt.datetime.now(dt.timezone.utc).isoformat()})
         if profile == 'standard8':
-            record['purpose'] = 'Four-GPU priority and eight-GPU standard candidates sharing per-model checkpoints'
+            record['purpose'] = 'Eight-GPU standard candidates sharing existing per-model checkpoints; enabled profiles are controlled by experiment_plan.json'
+        elif profile == 'long8':
+            record['purpose'] = 'Eight-GPU long jobs sharing existing per-model checkpoints; older candidates retained as history only'
         temporary = RECORD.with_suffix('.tmp')
         temporary.write_text(json.dumps(record, indent=2) + '\n')
         temporary.replace(RECORD)
@@ -114,7 +124,11 @@ def submit(model, profile, dependency=None):
 
 
 def worker(model, profile):
-    suffix = '8gpu_standard_200ep' if profile == 'standard8' else '4gpu_200ep'
+    if not profile_enabled(profile):
+        print(f'{profile} disabled by experiment plan; releasing allocation.', flush=True)
+        return 0
+    # QoS changes the allocation, not the eight-rank training configuration.
+    suffix = '8gpu_standard_200ep' if profile in ('standard8', 'long8') else '4gpu_200ep'
     config = ROOT / f'configs/{model}_{suffix}.json'
     cfg = read(config)
     output = ROOT / cfg['output_dir']
@@ -150,10 +164,10 @@ def worker(model, profile):
                 'updated_utc': dt.datetime.now(dt.timezone.utc).isoformat()}, indent=2) + '\n')
             print(f'Continuation submission failed; using current allocation: {error}', flush=True)
         environment = dict(os.environ, JIT_ALLOCATION_LOCK_HELD='1')
-        if profile in ('single', 'standard8'):
+        if profile in ('single', 'standard8', 'long8'):
             command = ['torchrun', '--standalone', f'--nproc_per_node={expected_world}',
                        'scripts/run.py', '--mode', 'train', '--config', str(config)]
-            if profile == 'standard8':
+            if profile in ('standard8', 'long8'):
                 command.append('--allow-expand-to-eight')
         else:
             hosts = subprocess.check_output(['scontrol', 'show', 'hostnames',

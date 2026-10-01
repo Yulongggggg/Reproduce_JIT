@@ -77,8 +77,13 @@ def main():
     waiting = ' PENDING ' in queue and ' RUNNING ' not in queue and len(complete) < len(MODELS)
     if waiting:
         text.append('**当前候选任务在排队，没有正在运行的 JiT 训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。')
-    if plan.get('standard8_enabled'):
+    if plan.get('long8_enabled'):
+        text.append('用户最新安排：为节约 SU，JiT 训练只使用 long QoS。B/16、L/16 各申请单节点 8 张 H100/H200，单次 48 小时至 7 天；旧四卡 priority 和八卡 standard 候选已撤销且不再自动恢复。所有候选共享同模型文件锁，从现有检查点续跑。其他项目不在本次调整范围。')
+    elif plan.get('enabled_profiles') == ['standard8']:
+        text.append('用户最新安排：JiT 训练只使用 standard QoS。B/16、L/16 各申请单节点 8 张 H100/H200，单次 24–48 小时；旧四卡 priority 和八卡 long 候选已撤销且不再自动恢复。所有候选共享同模型文件锁，从现有检查点续跑。其他项目不在本次调整范围。')
+    elif plan.get('standard8_enabled'):
         text.append('用户最新安排：保留已有四卡 priority 队列，增加 B/16、L/16 各一个单节点八卡 standard 备选，申请 24–48 小时。long 方案仅做过预检查，未提交。所有候选共享同模型文件锁；八卡实际接手后，旧四卡候选跳过该模型，不重复训练。')
+    if plan.get('long8_enabled') or plan.get('standard8_enabled'):
         text.append('八卡 B/16 每卡 batch=128、累积 1 次；L/16 每卡 batch=64、累积 2 次，均保持有效 batch=1024。四卡转八卡保留模型、优化器、三组 EMA、epoch 和 global step；保留旧 rank RNG，并为新增 rank 设置独立种子。数据分片、随机轨迹和归约顺序会变化，不声称逐位一致，也不把它标为从头八卡训练。')
         text.append('扩展计划：先完成 200 epoch 的固定 CFG 和完整论文流程 FID-50K，再判断是否延长到 600 epoch。质量阈值尚未最终确定，目前没有提交或自动启动 600 epoch；200 epoch 完成后定时器继续汇报，等待扩展决定。')
     for m in MODELS:
@@ -98,7 +103,7 @@ def main():
                     '各用 4 张 H200（2 节点各 2 卡），均在初始 NCCL barrier 报 '
                     '`ibv_modify_qp: Invalid argument errno 22`，尚未进入训练，未推进检查点。'
                     '已仅为双节点入口配置 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket`，'
-                    '下一次分配后先做真实四卡 all-reduce 检查。'
+                    '双节点入口保留真实四卡 all-reduce 检查；当前八卡单节点任务不使用此入口。'
                     '故障证据与配置范围见 [记录](multinode_network_issue.json)。')
         for m, probe in network_probes.items():
             name = f'JiT-{m[0].upper()}/{m[1:]}'
@@ -133,13 +138,21 @@ def main():
         if selection:
             text.append(f'JiT-{m[0].upper()}/{m[1:]} 第 {selection["completed_epochs"]} epoch 的 EMA/CFG 搜索已完成 {selection["completed_candidates"]}/{selection["total_candidates"]} 组。')
     retired = read(REPORTS/'jobs_8gpu_retired.json')
-    if retired and plan.get('standard8_enabled'):
+    if retired and plan.get('long8_enabled'):
+        text.append('此前取消的队列维持取消；新授权的八卡 long 候选登记在 jobs_flexible.json，最新 QoS 切换和取消记录见 [qos_switch_long.json](qos_switch_long.json)。')
+    elif retired and plan.get('enabled_profiles') == ['standard8']:
+        text.append('此前取消的队列维持取消；新八卡 standard 候选登记在 jobs_flexible.json，最新切换和取消记录见 [qos_switch_standard.json](qos_switch_standard.json)。')
+    elif retired and plan.get('standard8_enabled'):
         text.append('此前取消的八卡旧队列维持取消；新授权的八卡 standard 候选单独登记在 jobs_flexible.json。')
     elif retired:
         text.append('按用户明确的要求，每个训练任务总计四卡；B/16、L/16 可各用四卡并行。遗留单任务八卡待运行队列已取消；取消记录见 [jobs_8gpu_retired.json](jobs_8gpu_retired.json)。')
     else:
         text.append('8 卡实验使用独立目录 `runs/b16_200ep`、`runs/l16_200ep`；其结果不会与本页的 4 卡实验合并。')
-    if read(REPORTS/'jobs_flexible.json'):
+    if plan.get('long8_enabled'):
+        text.append('资源调度：唯一启用的候选类型为 long8，B/16 与 L/16 可独立运行，每任务 world_size=8、有效 batch=1024。自动续跑同样使用 long QoS；同模型文件锁防止并发写检查点，旧 profile 的提交和启动入口已禁用。')
+    elif plan.get('enabled_profiles') == ['standard8']:
+        text.append('资源调度：唯一启用的候选类型为 standard8，B/16 与 L/16 可独立运行，每任务 world_size=8、有效 batch=1024。自动续跑同样使用 standard QoS；同模型文件锁防止并发写检查点，priority 和 long 的提交与启动入口已禁用。')
+    elif read(REPORTS/'jobs_flexible.json'):
         text.append('资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点。B/16 独立候选允许 2–12 小时，L/16 允许 3–12 小时；原串行续跑链默认 3–12 小时，当前 B/16 入口也已放宽至最短 2 小时。失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。')
     resource_snapshot = read(REPORTS/'resource_snapshot.json')
     if resource_snapshot:
@@ -283,8 +296,8 @@ def main():
              '每个 50K 阶段完成后自动生成此报告并尝试提交、推送到 GitHub。单组评估结果可断点复用；推送失败记录在运行目录的 `report_publish.json`，不会中断训练。']
     (REPORTS/'REPORT.md').write_text(render_markdown(text))
     (REPORTS/'status.json').write_text(json.dumps({'updated_utc':stamp,'model_progress':progress,
-        'gpu_count':None if plan.get('standard8_enabled') else 4,
-        'gpu_counts_per_candidate':[4,8] if plan.get('standard8_enabled') else [4],
+        'gpu_count':8 if plan.get('enabled_profiles') in (['long8'], ['standard8']) else (None if plan.get('standard8_enabled') else 4),
+        'gpu_counts_per_candidate':[8] if plan.get('enabled_profiles') in (['long8'], ['standard8']) else ([4,8] if plan.get('standard8_enabled') else [4]),
         'last_training_gpu_count_by_model':worlds,'gpu_transitions':transitions,
         'experiment_plan':plan,'models_may_run_concurrently':True,
         'network_issue':network_issue,'network_probes':network_probes,
