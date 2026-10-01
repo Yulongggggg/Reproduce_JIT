@@ -1,6 +1,6 @@
 # JiT 官方配置复现实验报告
 
-更新时间：2026-10-01T00:02:37.327703+00:00
+更新时间：2026-10-01T01:56:51.882673+00:00
 
 ## 当前进度
 
@@ -8,7 +8,7 @@
 
 **当前候选任务在排队，没有正在运行的 JiT 训练作业。** 续跑从检查点恢复，尚未保存的日志轮数需要重跑。
 
-用户最新安排：保留已有四卡 priority 队列，增加 B/16、L/16 各一个单节点八卡 standard 备选，申请 24–48 小时。long 方案仅做过预检查，未提交。所有候选共享同模型文件锁；八卡实际接手后，旧四卡候选跳过该模型，不重复训练。
+用户最新安排：JiT 训练只使用 standard QoS。B/16、L/16 各申请单节点 8 张 H100/H200，单次 24–48 小时；旧四卡 priority 和八卡 long 候选已撤销且不再自动恢复。所有候选共享同模型文件锁，从现有检查点续跑。其他项目不在本次调整范围。
 
 八卡 B/16 每卡 batch=128、累积 1 次；L/16 每卡 batch=64、累积 2 次，均保持有效 batch=1024。四卡转八卡保留模型、优化器、三组 EMA、epoch 和 global step；保留旧 rank RNG，并为新增 rank 设置独立种子。数据分片、随机轨迹和归约顺序会变化，不声称逐位一致，也不把它标为从头八卡训练。
 
@@ -18,13 +18,13 @@ JiT-B/16 最近一次训练元数据记录为 4 卡。
 
 JiT-L/16 最近一次训练元数据记录为 4 卡。
 
-**跨节点启动故障：B/16 作业 107750（FAILED）；L/16 作业 107752（FAILED）。** 两个任务在美东 2026-09-29 14:37 先后获分配，各用 4 张 H200（2 节点各 2 卡），均在初始 NCCL barrier 报 `ibv_modify_qp: Invalid argument errno 22`，尚未进入训练，未推进检查点。已仅为双节点入口配置 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket`，下一次分配后先做真实四卡 all-reduce 检查。故障证据与配置范围见 [记录](multinode_network_issue.json)。
+**跨节点启动故障：B/16 作业 107750（FAILED）；L/16 作业 107752（FAILED）。** 两个任务在美东 2026-09-29 14:37 先后获分配，各用 4 张 H200（2 节点各 2 卡），均在初始 NCCL barrier 报 `ibv_modify_qp: Invalid argument errno 22`，尚未进入训练，未推进检查点。已仅为双节点入口配置 `NCCL_IB_DISABLE=1`、`NCCL_NET=Socket`，双节点入口保留真实四卡 all-reduce 检查；当前八卡单节点任务不使用此入口。故障证据与配置范围见 [记录](multinode_network_issue.json)。
 
 JiT-B/16 TCP 替代方案尚无真实 GPU 验证结果，不能宣称故障已解决。
 
 JiT-L/16 TCP 替代方案尚无真实 GPU 验证结果，不能宣称故障已解决。
 
-自动汇报：每 6 小时在本对话和 GitHub 更新（美东 02:30, 08:30, 14:30, 20:30），状态 `active`；下一次计划时间：2026-09-30T20:30:00-04:00。定时器所在登录主机需保持运行。
+自动汇报：每 6 小时在本对话和 GitHub 更新（美东 02:30, 08:30, 14:30, 20:30），状态 `active`；下一次计划时间：2026-10-01T02:30:00-04:00。定时器所在登录主机需保持运行。
 
 - JiT-B/16：训练历史日志最高完成 184/200 epochs；可恢复检查点为第 184 轮。
 
@@ -36,9 +36,9 @@ JiT-B/16 第 160 epoch 中途评估：FID-8000=8.9342，CFG=2.9，EMA=0.9996。�
 
 JiT-L/16 最近 5 个已完成 epoch 平均 14.2 分钟；仅在相同吞吐下，剩余训练约 44.3 小时，不含评估、重试和排队。改变卡数或节点通信方式后的速度需实测，不能直接沿用此前耗时。
 
-此前取消的八卡旧队列维持取消；新授权的八卡 standard 候选单独登记在 jobs_flexible.json。
+此前取消的队列维持取消；新八卡 standard 候选登记在 jobs_flexible.json，最新切换和取消记录见 [qos_switch_standard.json](qos_switch_standard.json)。
 
-资源调度：B/16 与 L/16 可独立运行；候选包括单节点 4 卡和双节点各 2 卡，均保持 world_size=4、有效 batch=1024。每模型使用文件锁防止并发写同一检查点。B/16 独立候选允许 2–12 小时，L/16 允许 3–12 小时；原串行续跑链默认 3–12 小时，当前 B/16 入口也已放宽至最短 2 小时。失败/超时自动提交的后继从检查点续跑。候选不改变模型、优化器、CFG 或评估协议。
+资源调度：唯一启用的候选类型为 standard8，B/16 与 L/16 可独立运行，每任务 world_size=8、有效 batch=1024。自动续跑同样使用 standard QoS；同模型文件锁防止并发写检查点，priority 和 long 的提交与启动入口已禁用。
 
 资源检查快照（2026-09-29T18:31:45.334160+00:00）：28 台 GPU 节点共 224 卡，其中 224 卡已被 Slurm 分配。这是分配计数，不是 GPU 利用率；MIXED 节点可能仅 CPU 有空闲。详细资源和候选状态见 [resource_snapshot.json](resource_snapshot.json)。
 
@@ -49,25 +49,11 @@ ImageNet 完整数据已校验、解压：1,281,167 images，1000 classes。
 
 Slurm 队列：
 ```text
-101984 jit_b16_l16_4gpu PENDING (Priority)
-109179 jit_b16_split PENDING (Priority)
-109184 jit_l16_split PENDING (Priority)
-111067 jit_l16_single PENDING (Priority)
-101994 jit_b16_l16_4gpu PENDING (Dependency)
-101993 jit_b16_l16_4gpu PENDING (Dependency)
-101992 jit_b16_l16_4gpu PENDING (Dependency)
-101991 jit_b16_l16_4gpu PENDING (Dependency)
-101990 jit_b16_l16_4gpu PENDING (Dependency)
-101989 jit_b16_l16_4gpu PENDING (Dependency)
-101988 jit_b16_l16_4gpu PENDING (Dependency)
-101987 jit_b16_l16_4gpu PENDING (Dependency)
-101986 jit_b16_l16_4gpu PENDING (Dependency)
-101985 jit_b16_l16_4gpu PENDING (Dependency)
-110833 jit_l16_standard8 PENDING (Priority)
-110832 jit_b16_standard8 PENDING (Priority)
+111416 jit_l16_standard8 PENDING (Priority)
+111415 jit_b16_standard8 PENDING (Priority)
 ```
 
-流水线记录：2026-09-30 20:02 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
+流水线记录：2026-09-30 21:56 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 111415 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。
 
 ## 预注册设置
 

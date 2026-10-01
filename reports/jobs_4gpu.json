@@ -27,73 +27,17 @@
     101994
   ],
   "last_failed_job_id": 101979,
-  "next_train_job_id": 101984,
-  "pipeline_note": "2026-09-30 20:02 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 101984 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。",
+  "next_train_job_id": 111415,
+  "pipeline_note": "2026-09-30 21:56 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 111415 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。",
   "active_train_job_id": null,
   "last_timed_out_job_id": 107751,
-  "queue_checked_utc": "2026-10-01T00:02:36.850597+00:00",
+  "queue_checked_utc": "2026-10-01T01:56:38.531809+00:00",
   "queue_snapshot": {
-    "101984": {
+    "111416": {
       "state": "PENDING",
       "node_or_reason": "(Priority)"
     },
-    "109179": {
-      "state": "PENDING",
-      "node_or_reason": "(Priority)"
-    },
-    "109184": {
-      "state": "PENDING",
-      "node_or_reason": "(Priority)"
-    },
-    "111067": {
-      "state": "PENDING",
-      "node_or_reason": "(Priority)"
-    },
-    "101994": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101993": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101992": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101991": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101990": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101989": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101988": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101987": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101986": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "101985": {
-      "state": "PENDING",
-      "node_or_reason": "(Dependency)"
-    },
-    "110833": {
-      "state": "PENDING",
-      "node_or_reason": "(Priority)"
-    },
-    "110832": {
+    "111415": {
       "state": "PENDING",
       "node_or_reason": "(Priority)"
     }
@@ -107,6 +51,10 @@
     109184,
     110832,
     110833,
-    111067
+    111067,
+    111413,
+    111414,
+    111415,
+    111416
   ]
 }
