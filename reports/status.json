@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-05T18:04:33.085407+00:00",
+  "updated_utc": "2026-10-06T00:01:37.561253+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -36,7 +36,7 @@
     "l16": null
   },
   "experiment_plan": {
-    "updated_utc": "2026-10-01T01:56:29.394648+00:00",
+    "updated_utc": "2026-10-05T22:11:57.956784+00:00",
     "standard8_enabled": true,
     "preserve_existing_priority_four_gpu_candidates": false,
     "standard8": {
@@ -165,6 +165,43 @@
       "submitted": false,
       "superseded_by_actual_submission": true,
       "checked_date_local": "2026-09-30"
+    },
+    "priority4": {
+      "enabled": true,
+      "authorized_local": "2026-10-05",
+      "request": "User request 2026-10-05: keep queued standard8 jobs 111415 and 111416 untouched, and add one priority job that first trains B/16 from epoch 184 to 200.",
+      "models": [
+        "b16"
+      ],
+      "qos": "priority",
+      "nodes": 1,
+      "gpus_per_node": 4,
+      "cpu_cores": 40,
+      "memory": "256G",
+      "time_max_hours": 8,
+      "time_min_hours": null,
+      "scope": "Training only, up to the 200-epoch checkpoint; --train-only skips final evaluation; no automatic continuation or resubmission.",
+      "config": "configs/b16_4gpu_200ep.json: world_size=4, batch 128 x accumulation 2, all hyperparameters unchanged from epochs 1-184.",
+      "evaluation": "Fixed-CFG and paper-search FID-50K for B/16 remain with the queued standard8 job 111415 unless the user decides otherwise.",
+      "collision_policy": "If 111415 starts while this job holds the B/16 lock, it waits up to 9 hours for the lock instead of releasing its allocation.",
+      "preserved_jobs": [
+        111415,
+        111416
+      ],
+      "submitted_jobs": [
+        {
+          "model": "b16",
+          "job_id": 120736,
+          "state_at_check": "PENDING",
+          "qos": "priority",
+          "gpus": 4,
+          "wall_time_max": "08:00:00",
+          "wall_time_min": null,
+          "test_only_estimated_start_local": "2026-10-09T00:49:23",
+          "estimate_note": "Slurm test-only estimate on 2026-10-05 during the alphagpu maintenance reservation (10/5-10/15); not a commitment.",
+          "submitted_local": "2026-10-05T18:13:50.491798-04:00"
+        }
+      ]
     }
   },
   "models_may_run_concurrently": true,
@@ -263,11 +300,15 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 111415,
-    "pipeline_note": "2026-10-05 14:04 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-10-05 20:01 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 107751,
-    "queue_checked_utc": "2026-10-05T18:04:32.599023+00:00",
+    "queue_checked_utc": "2026-10-06T00:01:37.122662+00:00",
     "queue_snapshot": {
+      "120736": {
+        "state": "PENDING",
+        "node_or_reason": "(Priority)"
+      },
       "111416": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
@@ -290,7 +331,8 @@
       111413,
       111414,
       111415,
-      111416
+      111416,
+      120736
     ]
   }
 }
