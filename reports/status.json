@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-08T12:00:27.114019+00:00",
+  "updated_utc": "2026-10-08T18:30:22.471543+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -36,7 +36,7 @@
     "l16": null
   },
   "experiment_plan": {
-    "updated_utc": "2026-10-05T22:11:57.956784+00:00",
+    "updated_utc": "2026-10-08T17:27:56.504404+00:00",
     "standard8_enabled": true,
     "preserve_existing_priority_four_gpu_candidates": false,
     "standard8": {
@@ -201,7 +201,40 @@
           "estimate_note": "Slurm test-only estimate on 2026-10-05 during the alphagpu maintenance reservation (10/5-10/15); not a commitment.",
           "submitted_local": "2026-10-05T18:13:50.491798-04:00"
         }
-      ]
+      ],
+      "epoch_target_2026_10_08": 300,
+      "time_max_hours_2026_10_08": 12,
+      "scope_update_2026_10_08": "Same job 120736 (queue position kept): trains B/16 184->200, evaluates epoch 200 with the paper protocol in the same allocation, then continues toward 300 until the 12 h limit chosen by the user; the eight-GPU standard8 job continues to 300 and runs the final evaluation."
+    },
+    "epoch_extension": {
+      "authorized_local": "2026-10-08",
+      "request": "User 2026-10-08: finish B/16 first and run it to 300 epochs; queue L/16 to at least 400 epochs; keep queue positions (no cancel/resubmit); evaluate along the way with separate single-GPU standard jobs.",
+      "targets": {
+        "b16_4gpu_200ep": 300,
+        "l16_4gpu_200ep": 400
+      },
+      "rule": "resume_policy.validate_resume accepts an epochs increase only when run.py finds the matching target here, both configs use the constant LR schedule, and the checkpoint is not beyond the new target.",
+      "paper_reference": "Published FIDs exist for 200 and 600 epochs only; 300/400 summaries report status no_published_reference.",
+      "milestones": "run.py now keeps a checkpoint-NNN.pth hard link at every 100 epochs."
+    },
+    "milestone_eval": {
+      "b16": {
+        "epochs": [
+          200
+        ],
+        "mode": "full",
+        "timeout_hours": 14
+      },
+      "l16": {
+        "epochs": [
+          200
+        ],
+        "mode": "full",
+        "timeout_hours": 14
+      },
+      "authorized_local": "2026-10-08",
+      "request": "User 2026-10-08: reproduction is the goal; keep every queue position and make the reproduction succeed.",
+      "rule": "resource_queue.worker trains to each listed epoch with run.py --stop-at-epoch, evaluates it in the same allocation with scripts/eval_milestone.py (paper protocol, summary-epNNN.json), then resumes the normal command. Applies to priority4 and eight-GPU profiles; evaluation failures are recorded in milestone_eval_error.json and do not stop training."
     }
   },
   "models_may_run_concurrently": true,
@@ -300,10 +333,10 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 111415,
-    "pipeline_note": "2026-10-08 08:00 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-10-08 14:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 107751,
-    "queue_checked_utc": "2026-10-08T12:00:26.656842+00:00",
+    "queue_checked_utc": "2026-10-08T18:30:21.948211+00:00",
     "queue_snapshot": {
       "120736": {
         "state": "PENDING",
