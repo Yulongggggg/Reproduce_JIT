@@ -28,15 +28,11 @@
   ],
   "last_failed_job_id": 101979,
   "next_train_job_id": 111415,
-  "pipeline_note": "2026-10-08 14:30 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 111415 正在排队（(Priority)）。 训练历史最大轮数和可恢复检查点分别列出。",
-  "active_train_job_id": null,
+  "pipeline_note": "2026-10-08 20:30 EDT 自动检查：正在运行：120736 (alphagpu06)。 训练历史最大轮数和可恢复检查点分别列出。",
+  "active_train_job_id": 120736,
   "last_timed_out_job_id": 107751,
-  "queue_checked_utc": "2026-10-08T18:30:21.948211+00:00",
+  "queue_checked_utc": "2026-10-09T00:30:03.110814+00:00",
   "queue_snapshot": {
-    "120736": {
-      "state": "PENDING",
-      "node_or_reason": "(Priority)"
-    },
     "111416": {
       "state": "PENDING",
       "node_or_reason": "(Priority)"
@@ -44,9 +40,15 @@
     "111415": {
       "state": "PENDING",
       "node_or_reason": "(Priority)"
+    },
+    "120736": {
+      "state": "RUNNING",
+      "node_or_reason": "alphagpu06"
     }
   },
-  "active_train_job_ids": [],
+  "active_train_job_ids": [
+    120736
+  ],
   "additional_job_ids": [
     107750,
     107751,
