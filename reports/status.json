@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-09T12:30:05.528839+00:00",
+  "updated_utc": "2026-10-09T18:30:03.423041+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -24,8 +24,9 @@
       "checkpoint_updated_utc": "2026-09-30T23:37:29.675090+00:00"
     }
   },
-  "gpu_count": 8,
+  "gpu_count": null,
   "gpu_counts_per_candidate": [
+    4,
     8
   ],
   "last_training_gpu_count_by_model": {
@@ -37,7 +38,7 @@
     "l16": null
   },
   "experiment_plan": {
-    "updated_utc": "2026-10-09T05:52:01.888639+00:00",
+    "updated_utc": "2026-10-09T16:57:09.241338+00:00",
     "standard8_enabled": true,
     "preserve_existing_priority_four_gpu_candidates": false,
     "standard8": {
@@ -117,7 +118,8 @@
       "gpu_eight_card_continuation": "pending actual allocation"
     },
     "enabled_profiles": [
-      "standard8"
+      "standard8",
+      "long8"
     ],
     "long8_enabled": false,
     "long8": {
@@ -211,14 +213,15 @@
       "authorized_local": "2026-10-08",
       "request": "User 2026-10-08: finish B/16 first and run it to 300 epochs; queue L/16 to at least 400 epochs; keep queue positions (no cancel/resubmit); evaluate along the way with separate single-GPU standard jobs.",
       "targets": {
-        "b16_4gpu_200ep": 200,
+        "b16_4gpu_200ep": 600,
         "l16_4gpu_200ep": 200
       },
       "rule": "resume_policy.validate_resume accepts an epochs increase only when run.py finds the matching target here, both configs use the constant LR schedule, and the checkpoint is not beyond the new target.",
       "paper_reference": "Published FIDs exist for 200 and 600 epochs only; 300/400 summaries report status no_published_reference.",
       "milestones": "run.py now keeps a checkpoint-NNN.pth hard link at every 100 epochs.",
       "b16_decision_2026_10_09": "User 2026-10-09: B/16 stops at 200 epochs. The checkpoint saved during job 120736 records a 300-epoch target; resume_policy accepts the authorized lower target only because it equals the completed epoch, so no further B/16 training runs. The epoch-200 paper-protocol evaluation (120736, then follow-up 127599) is the final B/16 result and also writes summary.json.",
-      "l16_decision_2026_10_09": "User 2026-10-09: L/16 to 200 epochs as soon as possible (the published comparison point); the L/16 checkpoint already records a 200-epoch target, so no extension is needed. The target can be raised later without resubmitting."
+      "l16_decision_2026_10_09": "User 2026-10-09: L/16 to 200 epochs as soon as possible (the published comparison point); the L/16 checkpoint already records a 200-epoch target, so no extension is needed. The target can be raised later without resubmitting.",
+      "decision_20261009_b16_600": "User 2026-10-09: \"\u73b0\u5728\u6392\u961f\u4e00\u4e2along\u7684\uff0c\u7b49\u628ab16\u8dd1\u5230600epoch\". B/16 continues from its 200-epoch checkpoint to 600 epochs (constant LR, so the schedule does not depend on the target) in a long-QoS eight-GPU job; the 200-epoch paper-protocol evaluation stays in summary-ep200.json."
     },
     "milestone_eval": {
       "b16": {
@@ -226,7 +229,9 @@
           200
         ],
         "mode": "full",
-        "timeout_hours": 14
+        "timeout_hours": 14,
+        "enabled": false,
+        "disabled_note": "2026-10-09: B/16 continues to 600 epochs; its 200-epoch evaluation is finished by the 4-GPU follow-up job or the 4-GPU allocation pre-task (cached points need world size 4). An 8-GPU milestone run would recompute and overwrite the 4-GPU points, so it is disabled."
       },
       "l16": {
         "epochs": [
@@ -256,6 +261,14 @@
         "authorized_local": "2026-10-09",
         "request": "l16\u5c3d\u5feb\u8dd1\u5230200",
         "note": "Queued job 111416 was updated in place with scontrol (QoS priority, 1 day, 12 h minimum); it was not cancelled. Its age factor showed 0 until the next 5-minute priority recalculation and then returned to the maximum 25,000 (accrue time 2026-09-30T21:55:51 kept): priority 125,932, rank 3 in alpha at 2026-10-09 01:17 EDT. Its automatic continuations are submitted with this QoS."
+      },
+      "b16/long8": {
+        "qos": "long",
+        "time": "7-00:00:00",
+        "time_min": "3-00:00:00",
+        "authorized_local": "2026-10-09",
+        "request": "\u73b0\u5728\u6392\u961f\u4e00\u4e2along\u7684\uff0c\u7b49\u628ab16\u8dd1\u5230600epoch",
+        "note": "Three-day minimum so the remaining 400 epochs (about 51-56 h on eight GPUs) and the 600-epoch evaluation fit one allocation."
       }
     },
     "goal_20261009": {
@@ -277,6 +290,15 @@
     },
     "allocation_pretasks": {
       "l16/standard8": [
+        {
+          "model": "b16",
+          "epoch": 200,
+          "gpus": 4,
+          "mode": "full",
+          "timeout_hours": 1.5
+        }
+      ],
+      "b16/long8": [
         {
           "model": "b16",
           "epoch": 200,
@@ -396,16 +418,20 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 111415,
-    "pipeline_note": "2026-10-09 08:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-10-09 14:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 120736,
-    "queue_checked_utc": "2026-10-09T12:30:04.230942+00:00",
+    "queue_checked_utc": "2026-10-09T18:30:02.191205+00:00",
     "queue_snapshot": {
       "111416": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
       },
       "111415": {
+        "state": "PENDING",
+        "node_or_reason": "(Priority)"
+      },
+      "128233": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
       }
@@ -424,7 +450,8 @@
       111414,
       111415,
       111416,
-      120736
+      120736,
+      128233
     ]
   }
 }

@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-09T05:52:01.888639+00:00",
+  "updated_utc": "2026-10-09T16:57:09.241338+00:00",
   "standard8_enabled": true,
   "preserve_existing_priority_four_gpu_candidates": false,
   "standard8": {
@@ -79,7 +79,8 @@
     "gpu_eight_card_continuation": "pending actual allocation"
   },
   "enabled_profiles": [
-    "standard8"
+    "standard8",
+    "long8"
   ],
   "long8_enabled": false,
   "long8": {
@@ -173,14 +174,15 @@
     "authorized_local": "2026-10-08",
     "request": "User 2026-10-08: finish B/16 first and run it to 300 epochs; queue L/16 to at least 400 epochs; keep queue positions (no cancel/resubmit); evaluate along the way with separate single-GPU standard jobs.",
     "targets": {
-      "b16_4gpu_200ep": 200,
+      "b16_4gpu_200ep": 600,
       "l16_4gpu_200ep": 200
     },
     "rule": "resume_policy.validate_resume accepts an epochs increase only when run.py finds the matching target here, both configs use the constant LR schedule, and the checkpoint is not beyond the new target.",
     "paper_reference": "Published FIDs exist for 200 and 600 epochs only; 300/400 summaries report status no_published_reference.",
     "milestones": "run.py now keeps a checkpoint-NNN.pth hard link at every 100 epochs.",
     "b16_decision_2026_10_09": "User 2026-10-09: B/16 stops at 200 epochs. The checkpoint saved during job 120736 records a 300-epoch target; resume_policy accepts the authorized lower target only because it equals the completed epoch, so no further B/16 training runs. The epoch-200 paper-protocol evaluation (120736, then follow-up 127599) is the final B/16 result and also writes summary.json.",
-    "l16_decision_2026_10_09": "User 2026-10-09: L/16 to 200 epochs as soon as possible (the published comparison point); the L/16 checkpoint already records a 200-epoch target, so no extension is needed. The target can be raised later without resubmitting."
+    "l16_decision_2026_10_09": "User 2026-10-09: L/16 to 200 epochs as soon as possible (the published comparison point); the L/16 checkpoint already records a 200-epoch target, so no extension is needed. The target can be raised later without resubmitting.",
+    "decision_20261009_b16_600": "User 2026-10-09: \"现在排队一个long的，等把b16跑到600epoch\". B/16 continues from its 200-epoch checkpoint to 600 epochs (constant LR, so the schedule does not depend on the target) in a long-QoS eight-GPU job; the 200-epoch paper-protocol evaluation stays in summary-ep200.json."
   },
   "milestone_eval": {
     "b16": {
@@ -188,7 +190,9 @@
         200
       ],
       "mode": "full",
-      "timeout_hours": 14
+      "timeout_hours": 14,
+      "enabled": false,
+      "disabled_note": "2026-10-09: B/16 continues to 600 epochs; its 200-epoch evaluation is finished by the 4-GPU follow-up job or the 4-GPU allocation pre-task (cached points need world size 4). An 8-GPU milestone run would recompute and overwrite the 4-GPU points, so it is disabled."
     },
     "l16": {
       "epochs": [
@@ -218,6 +222,14 @@
       "authorized_local": "2026-10-09",
       "request": "l16尽快跑到200",
       "note": "Queued job 111416 was updated in place with scontrol (QoS priority, 1 day, 12 h minimum); it was not cancelled. Its age factor showed 0 until the next 5-minute priority recalculation and then returned to the maximum 25,000 (accrue time 2026-09-30T21:55:51 kept): priority 125,932, rank 3 in alpha at 2026-10-09 01:17 EDT. Its automatic continuations are submitted with this QoS."
+    },
+    "b16/long8": {
+      "qos": "long",
+      "time": "7-00:00:00",
+      "time_min": "3-00:00:00",
+      "authorized_local": "2026-10-09",
+      "request": "现在排队一个long的，等把b16跑到600epoch",
+      "note": "Three-day minimum so the remaining 400 epochs (about 51-56 h on eight GPUs) and the 600-epoch evaluation fit one allocation."
     }
   },
   "goal_20261009": {
@@ -239,6 +251,15 @@
   },
   "allocation_pretasks": {
     "l16/standard8": [
+      {
+        "model": "b16",
+        "epoch": 200,
+        "gpus": 4,
+        "mode": "full",
+        "timeout_hours": 1.5
+      }
+    ],
+    "b16/long8": [
       {
         "model": "b16",
         "epoch": 200,
