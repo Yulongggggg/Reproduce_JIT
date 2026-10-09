@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-08T17:27:56.504404+00:00",
+  "updated_utc": "2026-10-09T05:52:01.888639+00:00",
   "standard8_enabled": true,
   "preserve_existing_priority_four_gpu_candidates": false,
   "standard8": {
@@ -173,12 +173,14 @@
     "authorized_local": "2026-10-08",
     "request": "User 2026-10-08: finish B/16 first and run it to 300 epochs; queue L/16 to at least 400 epochs; keep queue positions (no cancel/resubmit); evaluate along the way with separate single-GPU standard jobs.",
     "targets": {
-      "b16_4gpu_200ep": 300,
-      "l16_4gpu_200ep": 400
+      "b16_4gpu_200ep": 200,
+      "l16_4gpu_200ep": 200
     },
     "rule": "resume_policy.validate_resume accepts an epochs increase only when run.py finds the matching target here, both configs use the constant LR schedule, and the checkpoint is not beyond the new target.",
     "paper_reference": "Published FIDs exist for 200 and 600 epochs only; 300/400 summaries report status no_published_reference.",
-    "milestones": "run.py now keeps a checkpoint-NNN.pth hard link at every 100 epochs."
+    "milestones": "run.py now keeps a checkpoint-NNN.pth hard link at every 100 epochs.",
+    "b16_decision_2026_10_09": "User 2026-10-09: B/16 stops at 200 epochs. The checkpoint saved during job 120736 records a 300-epoch target; resume_policy accepts the authorized lower target only because it equals the completed epoch, so no further B/16 training runs. The epoch-200 paper-protocol evaluation (120736, then follow-up 127599) is the final B/16 result and also writes summary.json.",
+    "l16_decision_2026_10_09": "User 2026-10-09: L/16 to 200 epochs as soon as possible (the published comparison point); the L/16 checkpoint already records a 200-epoch target, so no extension is needed. The target can be raised later without resubmitting."
   },
   "milestone_eval": {
     "b16": {
@@ -197,6 +199,66 @@
     },
     "authorized_local": "2026-10-08",
     "request": "User 2026-10-08: reproduction is the goal; keep every queue position and make the reproduction succeed.",
-    "rule": "resource_queue.worker trains to each listed epoch with run.py --stop-at-epoch, evaluates it in the same allocation with scripts/eval_milestone.py (paper protocol, summary-epNNN.json), then resumes the normal command. Applies to priority4 and eight-GPU profiles; evaluation failures are recorded in milestone_eval_error.json and do not stop training."
+    "rule": "resource_queue.worker trains to each listed epoch with run.py --stop-at-epoch, evaluates it in the same allocation with scripts/eval_milestone.py (paper protocol, summary-epNNN.json), then resumes the normal command. Applies to priority4 and eight-GPU profiles; evaluation failures are recorded in milestone_eval_error.json and do not stop training.",
+    "b16_epoch200_followup": {
+      "job_id": 127599,
+      "qos": "priority",
+      "gpus": 4,
+      "time_limit": "03:00:00",
+      "dependency": "afterany:120736",
+      "reason": "120736 (12 h, H100) is expected to stop before the last paper-protocol points; running jobs cannot be extended by the user. The follow-up reuses the 4-GPU cached points (world size is part of the cache identity).",
+      "submitted_local": "2026-10-09 00:15"
+    }
+  },
+  "qos_override": {
+    "l16/standard8": {
+      "qos": "priority",
+      "time": "1-00:00:00",
+      "time_min": "12:00:00",
+      "authorized_local": "2026-10-09",
+      "request": "l16尽快跑到200",
+      "note": "Queued job 111416 was updated in place with scontrol (QoS priority, 1 day, 12 h minimum); it was not cancelled. Its age factor showed 0 until the next 5-minute priority recalculation and then returned to the maximum 25,000 (accrue time 2026-09-30T21:55:51 kept): priority 125,932, rank 3 in alpha at 2026-10-09 01:17 EDT. Its automatic continuations are submitted with this QoS."
+    }
+  },
+  "goal_20261009": {
+    "request": "很好，这俩都争取复现成功。然后尽量都跑完200epoch",
+    "targets_epochs": {
+      "b16": 200,
+      "l16": 200
+    },
+    "paper_fid50k_200ep": {
+      "b16": 4.37,
+      "l16": 2.79
+    },
+    "note": "Both models stop at 200 epochs and are evaluated with the full paper protocol (93-point 8K EMA/CFG search, then FID-50K)."
+  },
+  "results_publication": {
+    "authorized_local": "2026-10-09",
+    "request": "所有结果记得放回github",
+    "rule": "report.py mirrors every small result file of every run (stage summaries, per-point evaluation JSONs, progress/metadata, per-epoch train.jsonl) into reports/results/, plus one 8x8 JPEG grid per finished 50K sample folder; publish.sh commits reports/. Checkpoints and the 50K generated images stay on the cluster."
+  },
+  "allocation_pretasks": {
+    "l16/standard8": [
+      {
+        "model": "b16",
+        "epoch": 200,
+        "gpus": 4,
+        "mode": "full",
+        "timeout_hours": 1.5
+      }
+    ]
+  },
+  "allocation_pretasks_note": {
+    "authorized_local": "2026-10-09",
+    "request": "很好，这俩都争取复现成功。然后尽量都跑完200epoch / 反正尽快跑完，有一个开跑其他就不用重复跑了",
+    "reason": "sbatch --test-only at 2026-10-09 01:38 EDT put a newly eligible 4-GPU priority job at 2026-10-12 20:13, so 127599 would finish the last B/16 200-epoch search points about three days late. The L/16 eight-GPU allocation (111416, rank 3) first runs them on four GPUs (world size 4 matches the cached points), then trains L/16; skipped when B/16 is complete, without a checkpoint, or while another evaluation holds the epoch lock."
+  },
+  "model_redirect": {
+    "111415": "l16"
+  },
+  "model_redirect_note": {
+    "authorized_local": "2026-10-09",
+    "request": "反正尽快跑完，有一个开跑其他就不用重复跑了",
+    "reason": "B/16 training is finished, so queued job 111415 (submitted as B/16 eight-GPU standard, maximum queue age since 2026-09-30) continues L/16 when it starts; it releases at once if L/16 is complete or another L/16 allocation holds the lock. Its QoS is unchanged (standard)."
   }
 }

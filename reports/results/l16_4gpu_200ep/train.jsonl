@@ -1,0 +1,12 @@
+{"epoch": 1, "global_step": 1251, "model": "JiT-L/16", "loss": 0.2690645823185202, "lr": 3.9968025579536374e-05, "seconds": 897.6459082020447, "peak_memory_gib": 43.55503606796265}
+{"epoch": 2, "global_step": 2502, "model": "JiT-L/16", "loss": 0.10579727136259742, "lr": 7.996802557953638e-05, "seconds": 849.0038488181308, "peak_memory_gib": 43.55503606796265}
+{"epoch": 3, "global_step": 3753, "model": "JiT-L/16", "loss": 0.08982902789096847, "lr": 0.00011996802557953639, "seconds": 849.1051814230159, "peak_memory_gib": 43.55503606796265}
+{"epoch": 4, "global_step": 5004, "model": "JiT-L/16", "loss": 0.08202870076985287, "lr": 0.0001599680255795364, "seconds": 850.0126112820581, "peak_memory_gib": 43.55503606796265}
+{"epoch": 5, "global_step": 6255, "model": "JiT-L/16", "loss": 0.07749521818092402, "lr": 0.0001999680255795364, "seconds": 850.2757876487449, "peak_memory_gib": 43.55503606796265}
+{"epoch": 6, "global_step": 7506, "model": "JiT-L/16", "loss": 0.07445821297063912, "lr": 0.0002, "seconds": 849.9547644034028, "peak_memory_gib": 43.55503606796265}
+{"epoch": 7, "global_step": 8757, "model": "JiT-L/16", "loss": 0.07239402569741082, "lr": 0.0002, "seconds": 850.5309505313635, "peak_memory_gib": 43.55503606796265}
+{"epoch": 8, "global_step": 10008, "model": "JiT-L/16", "loss": 0.07104783092471335, "lr": 0.0002, "seconds": 850.1780339656398, "peak_memory_gib": 43.55503606796265}
+{"epoch": 9, "global_step": 11259, "model": "JiT-L/16", "loss": 0.07016679137159022, "lr": 0.0002, "seconds": 850.3261590180919, "peak_memory_gib": 43.55503606796265}
+{"epoch": 10, "global_step": 12510, "model": "JiT-L/16", "loss": 0.06950966936411808, "lr": 0.0002, "seconds": 849.2488165330142, "peak_memory_gib": 43.55503606796265}
+{"epoch": 11, "global_step": 13761, "model": "JiT-L/16", "loss": 0.0689563400549092, "lr": 0.0002, "seconds": 846.7608678806573, "peak_memory_gib": 43.55503606796265}
+{"epoch": 12, "global_step": 15012, "model": "JiT-L/16", "loss": 0.06855519002766537, "lr": 0.0002, "seconds": 849.1349431611598, "peak_memory_gib": 43.55503606796265}
