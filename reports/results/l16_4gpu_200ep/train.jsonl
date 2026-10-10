@@ -10,3 +10,4 @@
 {"epoch": 10, "global_step": 12510, "model": "JiT-L/16", "loss": 0.06950966936411808, "lr": 0.0002, "seconds": 849.2488165330142, "peak_memory_gib": 43.55503606796265}
 {"epoch": 11, "global_step": 13761, "model": "JiT-L/16", "loss": 0.0689563400549092, "lr": 0.0002, "seconds": 846.7608678806573, "peak_memory_gib": 43.55503606796265}
 {"epoch": 12, "global_step": 15012, "model": "JiT-L/16", "loss": 0.06855519002766537, "lr": 0.0002, "seconds": 849.1349431611598, "peak_memory_gib": 43.55503606796265}
+{"epoch": 13, "global_step": 16263, "model": "JiT-L/16", "loss": 0.06817887974776429, "lr": 0.0002, "seconds": 6862.321872626431, "peak_memory_gib": 43.60042953491211}

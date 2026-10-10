@@ -1,5 +1,5 @@
 {
-  "purpose": "Eight-GPU long jobs sharing existing per-model checkpoints; older candidates retained as history only",
+  "purpose": "Eight-GPU standard candidates sharing existing per-model checkpoints; enabled profiles are controlled by experiment_plan.json",
   "global_batch": 1024,
   "jobs": [
     {
@@ -136,6 +136,16 @@
       "qos": "long",
       "nodes": 1,
       "submitted_utc": "2026-10-09T16:58:03.599054+00:00"
+    },
+    {
+      "job_id": 128608,
+      "model": "l16",
+      "profile": "standard8",
+      "predecessor": 111416,
+      "gpu_count": 8,
+      "qos": "standard",
+      "nodes": 1,
+      "submitted_utc": "2026-10-10T00:38:17.344546+00:00"
     }
   ]
 }

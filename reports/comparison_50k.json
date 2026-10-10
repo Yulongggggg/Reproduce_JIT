@@ -8,13 +8,32 @@
     "num_images": 50000,
     "paper_fid": 4.37,
     "paper_source": "https://arxiv.org/html/2511.13720v2#S5.T6",
-    "our_fid": null,
-    "delta": null,
-    "status": "pending",
-    "reason": "Waiting for completed paper-protocol FID-50K"
+    "our_fid": 4.318986409313311,
+    "delta": -0.05101359068668909,
+    "status": "matched",
+    "reason": null,
+    "ema": 0.9998,
+    "cfg": 3.6,
+    "evaluation_protocol": {
+      "sampling_method": "heun",
+      "num_sampling_steps": 50,
+      "cfg_interval": [
+        0.1,
+        1.0
+      ],
+      "reference_dataset": "ImageNet-1K training set",
+      "class_num": 1000,
+      "class_balanced": true,
+      "fid_statistics_file": "jit_in256_stats.npz",
+      "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+      "metric_backend": "LTH14/torch-fidelity",
+      "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+      "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+      "generation_dtype": "bfloat16 autocast"
+    }
   },
   {
-    "gpu_count": 4,
+    "gpu_count": 8,
     "run": "l16_4gpu_200ep",
     "model": "JiT-L/16",
     "resolution": 256,

@@ -1,0 +1,12 @@
+{
+  "task": {
+    "model": "b16",
+    "epoch": 200,
+    "gpus": 4,
+    "mode": "full",
+    "timeout_hours": 1.5
+  },
+  "returncode": "timeout",
+  "job_id": "111416",
+  "updated_utc": "2026-10-10T02:08:17.414018+00:00"
+}
