@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-10T04:16:50.817541+00:00",
+  "updated_utc": "2026-10-10T06:30:02.131650+00:00",
   "model_progress": {
     "b16": {
       "status": "training",
@@ -142,7 +142,7 @@
     }
   },
   "experiment_plan": {
-    "updated_utc": "2026-10-09T16:57:09.241338+00:00",
+    "updated_utc": "2026-10-10T04:18:00.057591+00:00",
     "standard8_enabled": true,
     "preserve_existing_priority_four_gpu_candidates": false,
     "standard8": {
@@ -424,6 +424,17 @@
       "authorized_local": "2026-10-09",
       "request": "\u53cd\u6b63\u5c3d\u5feb\u8dd1\u5b8c\uff0c\u6709\u4e00\u4e2a\u5f00\u8dd1\u5176\u4ed6\u5c31\u4e0d\u7528\u91cd\u590d\u8dd1\u4e86",
       "reason": "B/16 training is finished, so queued job 111415 (submitted as B/16 eight-GPU standard, maximum queue age since 2026-09-30) continues L/16 when it starts; it releases at once if L/16 is complete or another L/16 allocation holds the lock. Its QoS is unchanged (standard)."
+    },
+    "wait_for_running": {
+      "l16": {
+        "enabled": true,
+        "max_wait_hours": 9
+      }
+    },
+    "wait_for_running_note": {
+      "authorized_local": "2026-10-10",
+      "request": "\u6211\u4e0d\u60f3\u91cd\u65b0\u6392\u961f\u6216\u8005\u7b49\u5f88\u4e45\uff0c\u4f60\u5e2e\u6211\u60f3\u529e\u6cd5",
+      "reason": "L/16 trains on alphagpu16, whose GPUs report hardware slowdown and power brake (about 42 min per epoch), until 2026-10-10 08:38. The L/16 job with the maximum queue age (submitted 2026-09-30) is switched to priority; if it starts before then it waits for the model lock instead of releasing. Stopping running jobs is not permitted for the assistant, so nothing is cancelled."
     }
   },
   "models_may_run_concurrently": true,
@@ -522,15 +533,11 @@
     ],
     "last_failed_job_id": 101979,
     "next_train_job_id": 111415,
-    "pipeline_note": "2026-10-09 20:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
+    "pipeline_note": "2026-10-10 02:30 EDT \u81ea\u52a8\u68c0\u67e5\uff1a\u76ee\u524d\u6ca1\u6709 JiT \u8bad\u7ec3\u4f5c\u4e1a\u8fd0\u884c\uff1b\u5019\u9009\u4f5c\u4e1a 111415 \u6b63\u5728\u6392\u961f\uff08(Priority)\uff09\u3002 \u8bad\u7ec3\u5386\u53f2\u6700\u5927\u8f6e\u6570\u548c\u53ef\u6062\u590d\u68c0\u67e5\u70b9\u5206\u522b\u5217\u51fa\u3002",
     "active_train_job_id": null,
     "last_timed_out_job_id": 120736,
-    "queue_checked_utc": "2026-10-10T00:30:19.359624+00:00",
+    "queue_checked_utc": "2026-10-10T06:30:01.000167+00:00",
     "queue_snapshot": {
-      "111416": {
-        "state": "PENDING",
-        "node_or_reason": "(Priority)"
-      },
       "111415": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
@@ -538,6 +545,10 @@
       "128233": {
         "state": "PENDING",
         "node_or_reason": "(Priority)"
+      },
+      "128608": {
+        "state": "PENDING",
+        "node_or_reason": "(JobHeldUser)"
       }
     },
     "active_train_job_ids": [],
@@ -555,7 +566,8 @@
       111415,
       111416,
       120736,
-      128233
+      128233,
+      128608
     ]
   }
 }

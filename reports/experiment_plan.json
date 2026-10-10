@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-09T16:57:09.241338+00:00",
+  "updated_utc": "2026-10-10T04:18:00.057591+00:00",
   "standard8_enabled": true,
   "preserve_existing_priority_four_gpu_candidates": false,
   "standard8": {
@@ -281,5 +281,16 @@
     "authorized_local": "2026-10-09",
     "request": "反正尽快跑完，有一个开跑其他就不用重复跑了",
     "reason": "B/16 training is finished, so queued job 111415 (submitted as B/16 eight-GPU standard, maximum queue age since 2026-09-30) continues L/16 when it starts; it releases at once if L/16 is complete or another L/16 allocation holds the lock. Its QoS is unchanged (standard)."
+  },
+  "wait_for_running": {
+    "l16": {
+      "enabled": true,
+      "max_wait_hours": 9
+    }
+  },
+  "wait_for_running_note": {
+    "authorized_local": "2026-10-10",
+    "request": "我不想重新排队或者等很久，你帮我想办法",
+    "reason": "L/16 trains on alphagpu16, whose GPUs report hardware slowdown and power brake (about 42 min per epoch), until 2026-10-10 08:38. The L/16 job with the maximum queue age (submitted 2026-09-30) is switched to priority; if it starts before then it waits for the model lock instead of releasing. Stopping running jobs is not permitted for the assistant, so nothing is cancelled."
   }
 }
