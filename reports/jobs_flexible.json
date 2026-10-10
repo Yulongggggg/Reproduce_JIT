@@ -146,6 +146,16 @@
       "qos": "standard",
       "nodes": 1,
       "submitted_utc": "2026-10-10T00:38:17.344546+00:00"
+    },
+    {
+      "job_id": 129177,
+      "model": "l16",
+      "profile": "standard8",
+      "predecessor": 111415,
+      "gpu_count": 8,
+      "qos": "standard",
+      "nodes": 1,
+      "submitted_utc": "2026-10-10T08:19:47.476937+00:00"
     }
   ]
 }
