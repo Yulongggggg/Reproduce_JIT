@@ -134,3 +134,14 @@
 {"epoch": 134, "global_step": 167634, "model": "JiT-L/16", "loss": 0.06381710427556392, "lr": 0.0002, "seconds": 614.6538580926135, "peak_memory_gib": 43.60786437988281}
 {"epoch": 135, "global_step": 168885, "model": "JiT-L/16", "loss": 0.06383956555458759, "lr": 0.0002, "seconds": 615.3872969364747, "peak_memory_gib": 43.60786437988281}
 {"epoch": 136, "global_step": 170136, "model": "JiT-L/16", "loss": 0.06384259657703524, "lr": 0.0002, "seconds": 617.3802080452442, "peak_memory_gib": 43.60786437988281}
+{"epoch": 137, "global_step": 171387, "model": "JiT-L/16", "loss": 0.06382994190585033, "lr": 0.0002, "seconds": 614.3341344371438, "peak_memory_gib": 43.60786437988281}
+{"epoch": 138, "global_step": 172638, "model": "JiT-L/16", "loss": 0.06380435812482826, "lr": 0.0002, "seconds": 613.0164821092039, "peak_memory_gib": 43.60786437988281}
+{"epoch": 139, "global_step": 173889, "model": "JiT-L/16", "loss": 0.06380233947607539, "lr": 0.0002, "seconds": 613.5717342514545, "peak_memory_gib": 43.60786437988281}
+{"epoch": 140, "global_step": 175140, "model": "JiT-L/16", "loss": 0.06379458810880982, "lr": 0.0002, "seconds": 615.2187046958134, "peak_memory_gib": 43.60786437988281}
+{"epoch": 141, "global_step": 176391, "model": "JiT-L/16", "loss": 0.0637863854424273, "lr": 0.0002, "seconds": 614.9285524468869, "peak_memory_gib": 43.60786437988281}
+{"epoch": 142, "global_step": 177642, "model": "JiT-L/16", "loss": 0.06377728627644759, "lr": 0.0002, "seconds": 618.0098729757592, "peak_memory_gib": 43.60786437988281}
+{"epoch": 143, "global_step": 178893, "model": "JiT-L/16", "loss": 0.06377808519785734, "lr": 0.0002, "seconds": 616.8963697217405, "peak_memory_gib": 43.60786437988281}
+{"epoch": 144, "global_step": 180144, "model": "JiT-L/16", "loss": 0.06374967164939924, "lr": 0.0002, "seconds": 620.9812017483637, "peak_memory_gib": 43.60786437988281}
+{"epoch": 145, "global_step": 181395, "model": "JiT-L/16", "loss": 0.06378584266375961, "lr": 0.0002, "seconds": 619.648616136983, "peak_memory_gib": 43.60786437988281}
+{"epoch": 146, "global_step": 182646, "model": "JiT-L/16", "loss": 0.06374806160930631, "lr": 0.0002, "seconds": 619.4754606550559, "peak_memory_gib": 43.60786437988281}
+{"epoch": 147, "global_step": 183897, "model": "JiT-L/16", "loss": 0.06375923431176933, "lr": 0.0002, "seconds": 613.3522123415023, "peak_memory_gib": 43.60786437988281}

@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-10T04:18:00.057591+00:00",
+  "updated_utc": "2026-10-11T11:08:25.481975+00:00",
   "standard8_enabled": true,
   "preserve_existing_priority_four_gpu_candidates": false,
   "standard8": {
@@ -292,5 +292,7 @@
     "authorized_local": "2026-10-10",
     "request": "我不想重新排队或者等很久，你帮我想办法",
     "reason": "L/16 trains on alphagpu16, whose GPUs report hardware slowdown and power brake (about 42 min per epoch), until 2026-10-10 08:38. The L/16 job with the maximum queue age (submitted 2026-09-30) is switched to priority; if it starts before then it waits for the model lock instead of releasing. Stopping running jobs is not permitted for the assistant, so nothing is cancelled."
-  }
+  },
+  "exclude_nodes": "alphagpu16",
+  "exclude_nodes_note": "2026-10-10: all eight alphagpu16 GPUs reported hardware slowdown and power brake (110-190 W at 100% utilisation; L/16 about 42 min per epoch versus about 10 min on alphagpu04). Every automatic submission excludes it; queued jobs were updated with scontrol."
 }
