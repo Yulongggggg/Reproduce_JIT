@@ -1,9 +1,9 @@
 {
-  "status": "training",
-  "completed_epochs": 184,
+  "status": "trained",
+  "completed_epochs": 200,
   "target_epochs": 200,
-  "global_step": 230184,
+  "global_step": 250200,
   "checkpoint": "/mnt/home/yliu5/Reproduce_JIT/runs/l16_4gpu_200ep/checkpoint-last.pth",
   "world_size": 8,
-  "updated_utc": "2026-10-16T18:22:04.711483+00:00"
+  "updated_utc": "2026-10-16T20:34:24.434242+00:00"
 }
