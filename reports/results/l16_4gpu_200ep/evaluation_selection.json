@@ -1,7 +1,7 @@
 {
   "policy": "jit-paper-v2-ema-cfg-search-8k-final-50k",
   "completed_epochs": 200,
-  "completed_candidates": 51,
+  "completed_candidates": 93,
   "total_candidates": 93,
   "candidates": [
     {
@@ -1992,6 +1992,1644 @@
       "inception_score_mean": 216.8915426377378,
       "inception_score_std": 5.721952254326199,
       "frechet_inception_distance": 6.0215878635778495
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.0,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.32067598961294,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 220.6586871763901,
+      "inception_score_std": 5.887710896432057,
+      "frechet_inception_distance": 6.107728696134018
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.1,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.10616200976074,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 224.62324353895315,
+      "inception_score_std": 6.127484818970629,
+      "frechet_inception_distance": 6.209049530562993
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.2,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.37243070453405,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 227.5096904221531,
+      "inception_score_std": 6.492080770412411,
+      "frechet_inception_distance": 6.31832811608956
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.3,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.74428095668554,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 230.5335535263504,
+      "inception_score_std": 6.781696955840011,
+      "frechet_inception_distance": 6.448794363820298
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.4,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.45187397673726,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 233.56590618784176,
+      "inception_score_std": 6.377443241896305,
+      "frechet_inception_distance": 6.59223935632474
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.5,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.59332787431777,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 236.70720716741343,
+      "inception_score_std": 5.874144959545174,
+      "frechet_inception_distance": 6.730818422713298
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.6,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.3973521180451,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 240.27129730636142,
+      "inception_score_std": 5.766317305282125,
+      "frechet_inception_distance": 6.86141458757794
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.7,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.39133699797094,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 242.23041202155235,
+      "inception_score_std": 6.0557739946277165,
+      "frechet_inception_distance": 6.982965447864672
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.8,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.16902989149094,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 244.53453829725208,
+      "inception_score_std": 6.56970429572667,
+      "frechet_inception_distance": 7.124183481617138
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 3.9,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.15471104346216,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 246.68357311984892,
+      "inception_score_std": 6.513221653303853,
+      "frechet_inception_distance": 7.238354057746676
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9998,
+      "cfg": 4.0,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.0954082943499,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 249.42498144381057,
+      "inception_score_std": 6.186982792210388,
+      "frechet_inception_distance": 7.3584171116330594
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.0,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.51454355753958,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 72.41081714232557,
+      "inception_score_std": 2.5625987876016683,
+      "frechet_inception_distance": 19.80058389333641
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.1,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.65218800120056,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 83.81256921669447,
+      "inception_score_std": 3.304607727778199,
+      "frechet_inception_distance": 16.92660337125045
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.2,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.51067507825792,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 95.00986673220783,
+      "inception_score_std": 4.18165326853709,
+      "frechet_inception_distance": 14.513600468560469
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.3,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 231.19206192530692,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 105.7937403291281,
+      "inception_score_std": 4.720066285337376,
+      "frechet_inception_distance": 12.46605542512907
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.4,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.78496494330466,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 116.6541944775967,
+      "inception_score_std": 4.659058562813296,
+      "frechet_inception_distance": 10.944678209766778
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.5,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.4791980292648,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 126.69338364151506,
+      "inception_score_std": 4.368694774020377,
+      "frechet_inception_distance": 9.72226225079919
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.6,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.88184889405966,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 136.09897364320761,
+      "inception_score_std": 4.216454463826845,
+      "frechet_inception_distance": 8.74616091549234
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.7,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.26741823740304,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 145.0033769787273,
+      "inception_score_std": 4.151426840671471,
+      "frechet_inception_distance": 8.013501176679938
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.8,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 231.21118531748652,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 153.43716438132213,
+      "inception_score_std": 4.799559018514125,
+      "frechet_inception_distance": 7.415970605291932
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 1.9,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.61309093423188,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 161.5667596045492,
+      "inception_score_std": 5.678068907482413,
+      "frechet_inception_distance": 6.961724378648228
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.0,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.17731564119458,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 169.33093406809076,
+      "inception_score_std": 6.089606053623924,
+      "frechet_inception_distance": 6.602534564395853
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.1,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.15259333141148,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 176.84932248871934,
+      "inception_score_std": 6.391149832270394,
+      "frechet_inception_distance": 6.3175947414298435
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.2,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.4486180599779,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 183.68421667945194,
+      "inception_score_std": 6.35667847783588,
+      "frechet_inception_distance": 6.151661087632476
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.3,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.79406865686178,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 189.68267450063232,
+      "inception_score_std": 6.61185701126585,
+      "frechet_inception_distance": 6.0538349600729475
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.4,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.8048073090613,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 196.2967283742711,
+      "inception_score_std": 6.887675283470223,
+      "frechet_inception_distance": 6.013231183367509
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.5,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.76071888394654,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 201.88111418111845,
+      "inception_score_std": 6.861222588323112,
+      "frechet_inception_distance": 6.016838319148292
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.6,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.17268033139408,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 207.0262273556641,
+      "inception_score_std": 7.012232163643,
+      "frechet_inception_distance": 6.040340584862747
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.7,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.16502118110657,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 210.84806529598887,
+      "inception_score_std": 7.168905540356743,
+      "frechet_inception_distance": 6.099186134827505
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.8,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.9771457593888,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 214.631388356439,
+      "inception_score_std": 6.683525274180576,
+      "frechet_inception_distance": 6.166844475925643
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 2.9,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.0873336046934,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 218.45388586197993,
+      "inception_score_std": 6.84371503812285,
+      "frechet_inception_distance": 6.252782802489946
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.0,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.3409286364913,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 221.70443912062643,
+      "inception_score_std": 6.931089945826147,
+      "frechet_inception_distance": 6.352207381219614
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.1,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.1144749391824,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 225.3146787176003,
+      "inception_score_std": 7.086380324841338,
+      "frechet_inception_distance": 6.450756153204168
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.2,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.07898093946278,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 228.2989634204433,
+      "inception_score_std": 6.828197805874295,
+      "frechet_inception_distance": 6.563189464785808
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.3,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.49305941723287,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 231.76172585302734,
+      "inception_score_std": 7.17006482138961,
+      "frechet_inception_distance": 6.670907274507783
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.4,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.60585741698742,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 235.13413515219773,
+      "inception_score_std": 7.317638633672827,
+      "frechet_inception_distance": 6.778508889281056
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.5,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.74634717218578,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 237.93378336648826,
+      "inception_score_std": 7.222617122150441,
+      "frechet_inception_distance": 6.911980498585876
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.6,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.4204025566578,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 240.65954595649396,
+      "inception_score_std": 6.77542426706033,
+      "frechet_inception_distance": 7.035941971201794
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.7,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.72060233354568,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 242.97002419684313,
+      "inception_score_std": 6.657777892487873,
+      "frechet_inception_distance": 7.161244115259024
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.8,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.43889889121056,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 245.07973304072956,
+      "inception_score_std": 6.599409616577645,
+      "frechet_inception_distance": 7.301768944526486
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 3.9,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 230.68738738633692,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 247.33109061241265,
+      "inception_score_std": 6.306689409569845,
+      "frechet_inception_distance": 7.422100837689641
+    },
+    {
+      "phase": "ema-select",
+      "completed_epochs": 200,
+      "ema": 0.9999,
+      "cfg": 4.0,
+      "num_images": 8000,
+      "seed": 0,
+      "world_size": 8,
+      "gen_bsz": 128,
+      "seconds": 229.7758583407849,
+      "model": "JiT-L/16",
+      "resolution": 256,
+      "samples_per_class": 8,
+      "evaluation_protocol": {
+        "sampling_method": "heun",
+        "num_sampling_steps": 50,
+        "cfg_interval": [
+          0.1,
+          1.0
+        ],
+        "reference_dataset": "ImageNet-1K training set",
+        "class_num": 1000,
+        "class_balanced": true,
+        "fid_statistics_file": "jit_in256_stats.npz",
+        "fid_statistics_sha256": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c",
+        "metric_backend": "LTH14/torch-fidelity",
+        "metric_backend_commit": "bfe72b995473e4fee9351705d7b005f17442a4ca",
+        "pixel_conversion": "round(clip((x+1)/2*255,0,255)), uint8 RGB PNG",
+        "generation_dtype": "bfloat16 autocast"
+      },
+      "checkpoint_identity": {
+        "file": "checkpoint-200.pth",
+        "bytes": 11018216508,
+        "mtime_ns": 1792182863714179023
+      },
+      "inception_score_mean": 249.1502460626441,
+      "inception_score_std": 6.379309139893392,
+      "frechet_inception_distance": 7.55274228237721
     }
   ]
 }
