@@ -1,5 +1,7 @@
 # Reproduce JiT
 
+**Results (200 epochs, FID-50K, paper evaluation protocol):** JiT-B/16 **4.319** (paper 4.37) and JiT-L/16 **2.747** (paper 2.79). Both reproduce the paper. Details, setup and evidence: [reports/RESULTS_SUMMARY.md](reports/RESULTS_SUMMARY.md).
+
 ImageNet-1K 上复现 JiT，当前按用户要求先跑 **B/16、L/16，各 200 epochs**。保留 README 固定 CFG 的 FID-50K，并补充论文 EMA/CFG 搜索流程的 FID-50K。两类结果分别报告；B/16 另保留 issue #56 的 CFG=3.6/EMA=0.9996 对照。
 
 - [训练状态与同 epoch 的 FID-50K 对照](reports/REPORT.md)
