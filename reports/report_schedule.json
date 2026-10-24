@@ -5,8 +5,8 @@
   "calendar": "02:30, 08:30, 14:30, 20:30",
   "host": "alpha1",
   "systemd_timer": "jit-report-6h.timer",
-  "last_attempt_utc": "2026-10-24T12:30:11.279422+00:00",
-  "next_report_local": "2026-10-24T14:30:00-04:00",
+  "last_attempt_utc": "2026-10-24T18:30:15.432951+00:00",
+  "next_report_local": "2026-10-24T20:30:00-04:00",
   "destinations": [
     "existing Codex conversation",
     "GitHub reports/REPORT.md"
