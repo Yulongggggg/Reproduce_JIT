@@ -28,10 +28,10 @@
   ],
   "last_failed_job_id": 101979,
   "next_train_job_id": 128608,
-  "pipeline_note": "2026-10-28 02:30 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 128608 正在排队（(JobHeldUser)）。 训练历史最大轮数和可恢复检查点分别列出。",
+  "pipeline_note": "2026-10-28 08:30 EDT 自动检查：目前没有 JiT 训练作业运行；候选作业 128608 正在排队（(JobHeldUser)）。 训练历史最大轮数和可恢复检查点分别列出。",
   "active_train_job_id": null,
   "last_timed_out_job_id": 120736,
-  "queue_checked_utc": "2026-10-28T06:30:14.718419+00:00",
+  "queue_checked_utc": "2026-10-28T12:30:36.061116+00:00",
   "queue_snapshot": {
     "128608": {
       "state": "PENDING",
